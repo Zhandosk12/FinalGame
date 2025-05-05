@@ -25,7 +25,7 @@ public class Bird extends Entity {
     private float maxHeight;
     private Tile destTile;
     private TextureRegion tRegion;
-    private static final float BIRD_SPEED = 100;
+    private static final float BIRD_SPEED = 15;
     private final AnimationManager animationManager = new AnimationManager();
 
     public Bird(Vector3 pos3, Box2dWorld box2d, ENTITYSTATE state) {
