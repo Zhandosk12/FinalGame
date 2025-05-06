@@ -6,14 +6,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.gdx.game.manager.ControlManager;
 import com.gdx.game.Enums.ENTITYSTATE;
 import com.gdx.game.Enums.ENTITYTYPE;
 import com.gdx.game.Media;
-import com.gdx.game.manager.AnimationManager;
 import com.gdx.game.box2d.Box2dHelper;
 import com.gdx.game.box2d.Box2dWorld;
+import com.gdx.game.manager.AnimationManager;
+import com.gdx.game.manager.ControlManager;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class Hero extends Entity {
@@ -21,6 +22,7 @@ public class Hero extends Entity {
     private static final int HERO_SPEED = 40;
     private TextureRegion tRegion;
     private final AnimationManager animationManager = new AnimationManager();
+    private final ArrayList<Entity> interactEntities = new ArrayList<>();
 
     public Hero(Vector3 pos3, Box2dWorld box2d, ENTITYSTATE state) {
         super(Media.hero,null,8, 8);
@@ -29,6 +31,7 @@ public class Hero extends Entity {
         this.getPos3().y = pos3.y;
         this.state = state;
         this.body = Box2dHelper.createBody(box2d.getWorld(), getWidth()/2, getHeight()/2, getWidth()/4, 0, pos3, null, BodyDef.BodyType.DynamicBody);
+        this.hashcode = body.getFixtureList().get(0).hashCode();
     }
 
     public void update(ControlManager controlManager) {
@@ -66,11 +69,21 @@ public class Hero extends Entity {
     }
 
     @Override
+    public void collision(Entity entity, boolean begin) {
+        if(begin){
+            interactEntities.add(entity);
+            System.out.println("You encountered a " + entity.getClass().getSimpleName());
+        } else {
+            interactEntities.remove(entity);
+        }
+    }
+
+    @Override
     public void draw(SpriteBatch batch) {
         setHeroTextureRegion();
         batch.draw(Media.heroShadow, getPos3().x, getPos3().y - (float)1.6, getWidth(), getHeight()/2);
         Optional.ofNullable(tRegion)
-                .ifPresent(t -> batch.draw(t, getPos3().x, getPos3().y, getWidth(), getHeight()*(float)1.2));
+            .ifPresent(t -> batch.draw(t, getPos3().x, getPos3().y, getWidth(), getHeight()*(float)1.2));
     }
 
     private void setHeroTextureRegion() {
@@ -100,8 +113,6 @@ public class Hero extends Entity {
     private Animation<TextureRegion> animation(TextureRegion[] textureRegions) {
         return animationManager.setAnimation(textureRegions);
     }
-
-
 
     private boolean isWalkingUp(){
         return state == ENTITYSTATE.WALKING_UP;

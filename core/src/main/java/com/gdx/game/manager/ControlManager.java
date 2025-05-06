@@ -16,13 +16,11 @@ public class ControlManager extends InputAdapter implements InputProcessor {
     private boolean down;
     private boolean left;
     private boolean right;
-
     private final Vector2 mouseClickPos = new Vector2();
     private final Vector2 mapClickPos = new Vector2();
-
     private boolean debug;
 
-    private final int screenHeight;
+    private int screenHeight;
 
     public boolean isUp() {
         return up;
@@ -44,9 +42,8 @@ public class ControlManager extends InputAdapter implements InputProcessor {
         return debug;
     }
 
-    public ControlManager(int screenHeight, OrthographicCamera camera) {
+    public ControlManager(int screenWidth, OrthographicCamera camera) {
         this.camera = camera;
-        this.screenHeight = screenHeight;
     }
 
     private void setMouseClickedPos(int screenX, int screenY) {
@@ -118,7 +115,6 @@ public class ControlManager extends InputAdapter implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
         setMouseClickedPos(screenX, screenY);
         return false;
     }
@@ -135,6 +131,4 @@ public class ControlManager extends InputAdapter implements InputProcessor {
         setMouseClickedPos(screenX, screenY);
         return false;
     }
-
-
 }

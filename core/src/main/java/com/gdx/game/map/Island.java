@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.gdx.game.Enums.TILETYPE;
-import com.gdx.game.Media;
 import com.gdx.game.box2d.Box2dHelper;
 import com.gdx.game.box2d.Box2dWorld;
 import com.gdx.game.entities.Entity;
@@ -16,10 +15,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static com.gdx.game.Media.cliff;
+import static com.gdx.game.Media.grass01;
+import static com.gdx.game.Media.grass02;
+import static com.gdx.game.Media.grass03;
+import static com.gdx.game.Media.grass04;
+import static com.gdx.game.Media.grassLeft;
+import static com.gdx.game.Media.grassLeftUpperEdge;
+import static com.gdx.game.Media.grassRight;
+import static com.gdx.game.Media.grassRightUpperEdge;
+import static com.gdx.game.Media.grassTop;
+import static com.gdx.game.Media.grassTopLeft;
+import static com.gdx.game.Media.grassTopRight;
+import static com.gdx.game.Media.water01;
+import static com.gdx.game.Media.water02;
+import static com.gdx.game.Media.water03;
+import static com.gdx.game.Media.water04;
 
 public class Island {
     private Tile centreTile;
-
     private Chunk chunk;
     private final ArrayList<Entity> entities = new ArrayList<>();
     String[] aGrassLeft = {"001001001", "001001000", "000001001"};
@@ -90,7 +104,7 @@ public class Island {
             tile.setTiletype(TILETYPE.GRASS);
 
             if(row == firstTileRow + 1) {
-                tile.setTexture(Media.cliff);
+                tile.setTexture(cliff);
                 tile.setTiletype(TILETYPE.CLIFF);
             }
         }
@@ -116,19 +130,19 @@ public class Island {
 
     private void updateImage(Tile tile) {
         if(Arrays.asList(aGrassLeft).contains(tile.getCode())) {
-            tile.setSecondaryTexture(Media.grassLeft);
+            tile.setSecondaryTexture(grassLeft);
         } else if(Arrays.asList(aGrassRight).contains(tile.getCode())) {
-            tile.setSecondaryTexture(Media.grassRight);
+            tile.setSecondaryTexture(grassRight);
         } else if(Arrays.asList(aGrassREnd).contains(tile.getCode())) {
-            tile.setSecondaryTexture(Media.grassLeftUpperEdge);
+            tile.setSecondaryTexture(grassLeftUpperEdge);
         } else if(Arrays.asList(aGrassLEnd).contains(tile.getCode())) {
-            tile.setSecondaryTexture(Media.grassRightUpperEdge);
+            tile.setSecondaryTexture(grassRightUpperEdge);
         } else if(Arrays.asList(aGrassTop).contains(tile.getCode())) {
-            tile.setSecondaryTexture(Media.grassTop);
+            tile.setSecondaryTexture(grassTop);
         } else if(Arrays.asList(aGrassTopRight).contains(tile.getCode())) {
-            tile.setSecondaryTexture(Media.grassTopRight);
+            tile.setSecondaryTexture(grassTopRight);
         } else if(Arrays.asList(aGrassTopLeft).contains(tile.getCode())) {
-            tile.setSecondaryTexture(Media.grassTopLeft);
+            tile.setSecondaryTexture(grassTopLeft);
         }
     }
 
@@ -136,10 +150,10 @@ public class Island {
         Texture grass;
         int tile = MathUtils.random(20);
         grass = switch (tile) {
-            case 2 -> Media.grass02;
-            case 3 -> Media.grass03;
-            case 4 -> Media.grass04;
-            default -> Media.grass01;
+            case 2 -> grass02;
+            case 3 -> grass03;
+            case 4 -> grass04;
+            default -> grass01;
         };
         return grass;
     }
@@ -148,10 +162,10 @@ public class Island {
         Texture water;
         int tile = MathUtils.random(20);
         water = switch (tile) {
-            case 2 -> Media.water02;
-            case 3 -> Media.water03;
-            case 4 -> Media.water04;
-            default -> Media.water01;
+            case 2 -> water02;
+            case 3 -> water03;
+            case 4 -> water04;
+            default -> water01;
         };
         return water;
     }
@@ -178,9 +192,9 @@ public class Island {
 
     private void addRandomTrees(Box2dWorld box2D, Tile tile) {
         Stream.of(tile)
-                .filter(Tile::isGrass)
-                .filter(t -> MathUtils.random(100) > 90)
-                .forEach(t -> entities.add(new Tree(tile.getPos3(), box2D)));
+            .filter(Tile::isGrass)
+            .filter(t -> MathUtils.random(100) > 90)
+            .forEach(t -> entities.add(new Tree(tile.getPos3(), box2D)));
     }
 
     private void generateHitboxes(Box2dWorld box2d) {
@@ -189,7 +203,7 @@ public class Island {
 
     private void createTileBody(Box2dWorld box2d, Tile tile) {
         Stream.of(tile)
-                .filter(t -> t.isNotPassable() && t.notIsAllWater())
-                .forEach(t -> Box2dHelper.createBody(box2d.getWorld(), chunk.getTileSize(), chunk.getTileSize(), 0, 0, t.getPos3(), null, BodyDef.BodyType.StaticBody));
+            .filter(t -> t.isNotPassable() && t.notIsAllWater())
+            .forEach(t -> Box2dHelper.createBody(box2d.getWorld(), chunk.getTileSize(), chunk.getTileSize(), 0, 0, t.getPos3(), null, BodyDef.BodyType.StaticBody));
     }
 }

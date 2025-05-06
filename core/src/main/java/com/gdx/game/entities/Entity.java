@@ -18,6 +18,8 @@ public class Entity implements Comparable<Entity> {
     public ENTITYTYPE type;
     public ENTITYSTATE state;
     public Body body;
+    public int hashcode;
+    public Body sensor;
 
     public Boolean ticks;
     public float time;
@@ -43,8 +45,6 @@ public class Entity implements Comparable<Entity> {
     public void setTexture(Texture texture) {
         this.texture = texture;
     }
-
-
     public float getWidth() {
         return width;
     }
@@ -57,11 +57,9 @@ public class Entity implements Comparable<Entity> {
         return (float) 0;
     }
 
-
     public float getDirectionY() {
         return (float) 0;
     }
-
 
     public void draw(SpriteBatch batch) {
         if(shadow != null) batch.draw(shadow, pos3.x, pos3.y, width, height);
@@ -88,6 +86,8 @@ public class Entity implements Comparable<Entity> {
         getPos3().x = body.getPosition().x - getWidth()/2;
         getPos3().y = body.getPosition().y - getHeight()/4;
     }
+
+    public void collision(Entity entity, boolean begin){}
 
     @Override
     public int compareTo(Entity entity) {

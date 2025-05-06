@@ -46,8 +46,8 @@ public class MenuScreen extends AbstractScreen {
         Texture backgroundSheet = Media.backgroundSheet;
 
         TextureRegion[][] tmp = animationManager.setTextureRegionsDouble(backgroundSheet,
-                backgroundSheet.getWidth() / nbCol,
-                backgroundSheet.getHeight() / nbRow);
+            backgroundSheet.getWidth() / nbCol,
+            backgroundSheet.getHeight() / nbRow);
 
         TextureRegion[] walkFrames = new TextureRegion[nbCol * nbRow];
         int index = 0;

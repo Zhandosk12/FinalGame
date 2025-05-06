@@ -35,6 +35,7 @@ public class GameScreen extends AbstractScreen {
 
         island.getEntities().add(hero);
         island.getEntities().add(bird);
+        box2d.populateEntityMap(island.getEntities());
     }
 
     @Override
@@ -47,8 +48,6 @@ public class GameScreen extends AbstractScreen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // GAME LOGIC
         hero.update(controlManager);
 
         for(Entity entity: island.getEntities()) {
@@ -72,7 +71,6 @@ public class GameScreen extends AbstractScreen {
         gdxGame.getBatch().setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         gdxGame.getBatch().begin();
-        // Draw all tiles in the chunk / chunk rows
         for(ArrayList<Tile> rows : island.getChunk().getTiles()) {
             for(Tile tile : rows) {
                 gdxGame.getBatch().draw(tile.getTexture(), tile.getPos3().x, tile.getPos3().y, tile.getSize(), tile.getSize());

@@ -6,36 +6,36 @@ import com.gdx.game.screen.GameScreen;
 import com.gdx.game.screen.MenuScreen;
 
 public class GdxGame extends Game {
-	private SpriteBatch batch;
-	private MenuScreen menuScreen;
-	private GameScreen gameScreen;
+    private SpriteBatch batch;
+    private MenuScreen menuScreen;
+    private GameScreen gameScreen;
 
-	public SpriteBatch getBatch() {
-		return batch;
-	}
+    public SpriteBatch getBatch() {
+        return batch;
+    }
 
-	public GameScreen getGameScreen() {
-		return gameScreen;
-	}
+    public GameScreen getGameScreen() {
+        return gameScreen;
+    }
 
-	public void create() {
-		batch = new SpriteBatch();
+    public void create() {
+        batch = new SpriteBatch();
 
-		menuScreen = new MenuScreen(this);
-		gameScreen = new GameScreen(this);
+        menuScreen = new MenuScreen(this);
+        gameScreen = new GameScreen(this);
 
-		this.setScreen(menuScreen);
-	}
+        this.setScreen(menuScreen);
+    }
 
-	public void render() {
-		super.render();
-	}
+    public void render() {
+        super.render();
+    }
 
-	public void dispose() {
-		super.dispose();
-		batch.dispose();
-		menuScreen.dispose();
-		gameScreen.dispose();
-		Media.dispose();
-	}
+    public void dispose() {
+        super.dispose();
+        batch.dispose();
+        menuScreen.dispose();
+        gameScreen.dispose();
+        Media.dispose();
+    }
 }
