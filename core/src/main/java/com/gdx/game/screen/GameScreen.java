@@ -3,13 +3,14 @@ package com.gdx.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
-import com.gdx.game.Enums;
 import com.gdx.game.GdxGame;
 import com.gdx.game.Media;
 import com.gdx.game.box2d.Box2dWorld;
 import com.gdx.game.entities.Bird;
 import com.gdx.game.entities.Entity;
+import com.gdx.game.entities.EntityEnums;
 import com.gdx.game.entities.Hero;
+import com.gdx.game.entities.Rabite;
 import com.gdx.game.manager.CameraManager;
 import com.gdx.game.manager.ControlManager;
 import com.gdx.game.map.Island;
@@ -17,8 +18,10 @@ import com.gdx.game.map.Tile;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class GameScreen extends AbstractScreen {
+
     private final Box2dWorld box2d;
     private ControlManager controlManager;
     private final Island island;
@@ -30,18 +33,20 @@ public class GameScreen extends AbstractScreen {
         box2d = new Box2dWorld();
         island = new Island(box2d);
         Vector3 islandCentrePos3 = island.getCentreTile().getPos3();
-        hero = new Hero(islandCentrePos3, box2d, Enums.ENTITYSTATE.WALKING_DOWN);
-        Bird bird = new Bird(new Vector3(islandCentrePos3.x - 20, islandCentrePos3.y - 20, 0), box2d, Enums.ENTITYSTATE.FLYING);
+        hero = new Hero(islandCentrePos3, box2d, EntityEnums.ENTITYSTATE.WALKING_DOWN);
+        Bird bird = new Bird(new Vector3(islandCentrePos3.x - 20, islandCentrePos3.y - 20, 0), box2d, EntityEnums.ENTITYSTATE.FLYING);
+        Rabite rabite = new Rabite(new Vector3(islandCentrePos3.x - 10, islandCentrePos3.y - 10, 0), box2d, EntityEnums.ENTITYSTATE.IDLE);
 
         island.getEntities().add(hero);
         island.getEntities().add(bird);
+        island.getEntities().add(rabite);
         box2d.populateEntityMap(island.getEntities());
     }
 
     @Override
     public void show() {
         CameraManager cameraManager = new CameraManager();
-        controlManager = cameraManager.insertControl(getCam());
+        controlManager = cameraManager.insertControl(getGameCam());
     }
 
     @Override
@@ -56,18 +61,31 @@ public class GameScreen extends AbstractScreen {
             entity.tick(Gdx.graphics.getDeltaTime(), island.getChunk());
         }
 
-        getCam().position.lerp(hero.getPos3(), .1f);
-        getCam().update();
+        getGameCam().position.lerp(hero.getPos3(), .1f);
+        getGameCam().update();
 
         Collections.sort(island.getEntities());
 
         drawGame();
-        box2d.tick(getCam(), controlManager);
+        box2d.tick(getGameCam(), controlManager);
 
+        delta += Gdx.graphics.getDeltaTime();
+
+        if(hero.isCollision()) {
+            if(hero.getEntityCollision().getType() == EntityEnums.ENTITYTYPE.ENEMY) {
+                HashMap<String, Entity> entityMap = new HashMap<>();
+                entityMap.put("hero", hero);
+                entityMap.put("enemy", hero.getEntityCollision());
+                gdxGame.setEntityMap(entityMap);
+                gdxGame.setScreen(new BattleScreen(gdxGame));
+            }
+        }
+
+        island.clearRemovedEntities(box2d);
     }
 
     private void drawGame() {
-        gdxGame.getBatch().setProjectionMatrix(getCam().combined);
+        gdxGame.getBatch().setProjectionMatrix(getGameCam().combined);
         gdxGame.getBatch().setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         gdxGame.getBatch().begin();

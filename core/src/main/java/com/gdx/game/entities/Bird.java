@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.gdx.game.Enums.ENTITYSTATE;
-import com.gdx.game.Enums.ENTITYTYPE;
+import com.gdx.game.entities.EntityEnums.ENTITYSTATE;
+import com.gdx.game.entities.EntityEnums.ENTITYTYPE;
 import com.gdx.game.Media;
 import com.gdx.game.box2d.Box2dHelper;
 import com.gdx.game.box2d.Box2dWorld;
@@ -48,7 +48,7 @@ public class Bird extends Entity {
 
         batch.draw(Media.birdShadow, getPos3().x, getPos3().y, getWidth()/2, getHeight()/4);
         Optional.ofNullable(tRegion)
-            .ifPresent(t -> batch.draw(t, getPos3().x, getPos3().y + getPos3().z, getWidth()/2, getHeight()/2));
+                .ifPresent(t -> batch.draw(t, getPos3().x, getPos3().y + getPos3().z, getWidth()/2, getHeight()/2));
     }
 
     private void setBirdTextureRegion() {
@@ -123,9 +123,9 @@ public class Bird extends Entity {
 
     private void moveToDestination(float delta) {
         body.setTransform(body.getPosition().interpolate(new Vector2(destTile.getPos3().x + getWidth(),
-            destTile.getPos3().y + getHeight()), delta * BIRD_SPEED / 4, Interpolation.circle), 0);
+                destTile.getPos3().y + getHeight()), delta * BIRD_SPEED / 4, Interpolation.circle), 0);
         sensor.setTransform(body.getPosition().interpolate(new Vector2(destTile.getPos3().x + getWidth(),
-            destTile.getPos3().y + getHeight()), delta * BIRD_SPEED / 4, Interpolation.circle), 0);
+                destTile.getPos3().y + getHeight()), delta * BIRD_SPEED / 4, Interpolation.circle), 0);
 
         updatePositions();
     }
@@ -148,6 +148,7 @@ public class Bird extends Entity {
             getPos3().z -= 0.5F;
         }
         if(getPos3().z <= 0) {
+            // Landed
             getPos3().z = 0;
             state = ENTITYSTATE.NONE;
             toggleHitboxes(true);
@@ -216,7 +217,6 @@ public class Bird extends Entity {
     public boolean isNotAirBorn(){
         return getPos3().z == 0;
     }
-
     public boolean isNotHigh(){
         return getPos3().z < maxHeight;
     }

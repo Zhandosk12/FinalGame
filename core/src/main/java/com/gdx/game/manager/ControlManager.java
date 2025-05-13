@@ -16,11 +16,13 @@ public class ControlManager extends InputAdapter implements InputProcessor {
     private boolean down;
     private boolean left;
     private boolean right;
+    private boolean interact;
+    private boolean leftMouseButton;
+    private boolean rightMouseButton;
     private final Vector2 mouseClickPos = new Vector2();
     private final Vector2 mapClickPos = new Vector2();
     private boolean debug;
-
-    private int screenHeight;
+    private final int screenHeight;
 
     public boolean isUp() {
         return up;
@@ -38,12 +40,21 @@ public class ControlManager extends InputAdapter implements InputProcessor {
         return right;
     }
 
+    public boolean isInteract() {
+        return interact;
+    }
+
+    public void setInteract(boolean interact) {
+        this.interact = interact;
+    }
+
     public boolean isDebug() {
         return debug;
     }
 
-    public ControlManager(int screenWidth, OrthographicCamera camera) {
+    public ControlManager(int screenWidth, int screenHeight, OrthographicCamera camera) {
         this.camera = camera;
+        this.screenHeight = screenHeight;
     }
 
     private void setMouseClickedPos(int screenX, int screenY) {
@@ -101,6 +112,9 @@ public class ControlManager extends InputAdapter implements InputProcessor {
             case Keys.D:
                 right = false;
                 break;
+            case Keys.E:
+                interact = true;
+                break;
             case Keys.ESCAPE:
                 Gdx.app.exit();
                 break;
@@ -115,12 +129,19 @@ public class ControlManager extends InputAdapter implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if(pointer == 0 && button == 0) {
+            leftMouseButton = true;
+        }
+
         setMouseClickedPos(screenX, screenY);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if(pointer == 0 && button == 0) {
+            leftMouseButton = false;
+        }
 
         setMouseClickedPos(screenX, screenY);
         return false;

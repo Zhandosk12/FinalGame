@@ -9,7 +9,7 @@ public class Chunk {
     private final int numberRows;
     private final int numberCols;
     private final int tileSize;
-    private final ArrayList<ArrayList<Tile>> tiles;
+    private final ArrayList<ArrayList<com.gdx.game.map.Tile>> tiles;
 
     public Chunk(int numberRows, int numberCols, int tileSize) {
         this.tiles = new ArrayList<>();
@@ -30,38 +30,36 @@ public class Chunk {
         return tileSize;
     }
 
-
-    public List<ArrayList<Tile>> getTiles() {
+    public List<ArrayList<com.gdx.game.map.Tile>> getTiles() {
         return tiles;
     }
-
-    public Tile getTile(int row, int col) {
+    public com.gdx.game.map.Tile getTile(int row, int col) {
         return Optional.of(row)
-            .filter(r -> tiles.size() > r && r >= 0)
-            .map(tiles::get)
-            .filter(c -> c.size() > col && col >= 0)
-            .map(c -> c.get(col))
-            .orElse(null);
+                .filter(r -> tiles.size() > r && r >= 0)
+                .map(tiles::get)
+                .filter(c -> c.size() > col && col >= 0)
+                .map(c -> c.get(col))
+                .orElse(null);
     }
 
     public Tile getTile(Vector2 vector2) {
         int row = (int) ((vector2.y*getTileSize()/2) / getNumberRows());
         int col = (int) ((vector2.x*getTileSize()/2) / getNumberCols());
         return Optional.ofNullable(getTiles())
-            .filter(t -> t.size() > row && row >= 0)
-            .map(t -> t.get(row))
-            .filter(c -> c.size() > col && col >= 0)
-            .map(c -> c.get(col))
-            .orElse(null);
+                .filter(t -> t.size() > row && row >= 0)
+                .map(t -> t.get(row))
+                .filter(c -> c.size() > col && col >= 0)
+                .map(c -> c.get(col))
+                .orElse(null);
     }
 
     public String getTileCode(int row, int col) {
         return Optional.of(row)
-            .filter(r -> tiles.size() > r && r >= 0)
-            .map(tiles::get)
-            .filter(c -> c.size() > col && col >= 0)
-            .map(c -> c.get(col))
-            .map(t -> t.isGrass()? "1" : "0")
-            .orElse("0");
+                .filter(r -> tiles.size() > r && r >= 0)
+                .map(tiles::get)
+                .filter(c -> c.size() > col && col >= 0)
+                .map(c -> c.get(col))
+                .map(t -> t.isGrass()? "1" : "0")
+                .orElse("0");
     }
 }

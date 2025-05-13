@@ -6,23 +6,26 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.gdx.game.Enums.ENTITYSTATE;
-import com.gdx.game.Enums.ENTITYTYPE;
 import com.gdx.game.Media;
 import com.gdx.game.box2d.Box2dHelper;
 import com.gdx.game.box2d.Box2dWorld;
+import com.gdx.game.entities.EntityEnums.ENTITYSTATE;
+import com.gdx.game.entities.EntityEnums.ENTITYTYPE;
 import com.gdx.game.manager.AnimationManager;
 import com.gdx.game.manager.ControlManager;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-public class Hero extends Entity {
+public class Hero extends com.gdx.game.entities.Entity {
 
     private static final int HERO_SPEED = 40;
+    private boolean collision = false;
+    private com.gdx.game.entities.Entity entityCollision;
     private TextureRegion tRegion;
     private final AnimationManager animationManager = new AnimationManager();
-    private final ArrayList<Entity> interactEntities = new ArrayList<>();
+    private final ArrayList<com.gdx.game.entities.Entity> interactEntities = new ArrayList<>();
 
     public Hero(Vector3 pos3, Box2dWorld box2d, ENTITYSTATE state) {
         super(Media.hero,null,8, 8);
@@ -66,15 +69,29 @@ public class Hero extends Entity {
         body.setLinearVelocity(directionX * HERO_SPEED, directionY * HERO_SPEED);
 
         updatePositions();
+
+        interactAction(controlManager);
+    }
+
+    private void interactAction(ControlManager controlManager) {
+        Stream.of(interactEntities)
+                .filter(i -> controlManager.isInteract() && !i.isEmpty())
+                .forEach(i -> i.get(0).interact());
+
+        controlManager.setInteract(false);
     }
 
     @Override
-    public void collision(Entity entity, boolean begin) {
+    public void collision(com.gdx.game.entities.Entity entity, boolean begin) {
         if(begin){
             interactEntities.add(entity);
             System.out.println("You encountered a " + entity.getClass().getSimpleName());
+            setCollision(true);
+            setEntityCollision(entity);
         } else {
             interactEntities.remove(entity);
+            setCollision(false);
+            setEntityCollision(null);
         }
     }
 
@@ -83,7 +100,7 @@ public class Hero extends Entity {
         setHeroTextureRegion();
         batch.draw(Media.heroShadow, getPos3().x, getPos3().y - (float)1.6, getWidth(), getHeight()/2);
         Optional.ofNullable(tRegion)
-            .ifPresent(t -> batch.draw(t, getPos3().x, getPos3().y, getWidth(), getHeight()*(float)1.2));
+                .ifPresent(t -> batch.draw(t, getPos3().x, getPos3().y, getWidth(), getHeight()*(float)1.2));
     }
 
     private void setHeroTextureRegion() {
@@ -112,6 +129,22 @@ public class Hero extends Entity {
 
     private Animation<TextureRegion> animation(TextureRegion[] textureRegions) {
         return animationManager.setAnimation(textureRegions);
+    }
+
+    public boolean isCollision() {
+        return collision;
+    }
+
+    public void setCollision(boolean collision) {
+        this.collision = collision;
+    }
+
+    public com.gdx.game.entities.Entity getEntityCollision() {
+        return entityCollision;
+    }
+
+    public void setEntityCollision(Entity entityCollision) {
+        this.entityCollision = entityCollision;
     }
 
     private boolean isWalkingUp(){

@@ -1,8 +1,8 @@
 package com.gdx.game.map;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.gdx.game.Enums.TILETYPE;
 import com.gdx.game.entities.Entity;
+import com.gdx.game.map.MapEnums.TILETYPE;
 
 public class Tile extends Entity {
     private final int size;
@@ -13,9 +13,9 @@ public class Tile extends Entity {
     private TILETYPE tiletype;
 
     public Tile(int x, int y, int size, TILETYPE tiletype, Texture texture) {
-        super(texture,null,0,0);
-        this.getPos3().x = x*size;
-        this.getPos3().y = y*size;
+        super(texture, null, 0, 0);
+        this.getPos3().x = x * size;
+        this.getPos3().y = y * size;
         this.size = size;
         this.col = x;
         this.row = y;
@@ -27,16 +27,13 @@ public class Tile extends Entity {
         return size;
     }
 
-
     public int getRow() {
         return row;
     }
 
-
     public int getCol() {
         return col;
     }
-
 
     public String getCode() {
         return code;
@@ -53,7 +50,6 @@ public class Tile extends Entity {
     public void setSecondaryTexture(Texture secondaryTexture) {
         this.secondaryTexture = secondaryTexture;
     }
-
 
     public void setTiletype(TILETYPE tiletype) {
         this.tiletype = tiletype;

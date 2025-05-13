@@ -9,7 +9,6 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class Box2dHelper {
-
     public static Body createBody(World world, float width, float height, float xOffset, float yOffset, Vector3 pos3, Vector2 vector2, BodyDef.BodyType type) {
         Body body;
         BodyDef bodyDef = new BodyDef();

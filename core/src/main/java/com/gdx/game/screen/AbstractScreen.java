@@ -1,5 +1,6 @@
 package com.gdx.game.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -10,7 +11,8 @@ import com.gdx.game.manager.CameraManager;
 
 public class AbstractScreen implements Screen {
     protected final GdxGame gdxGame;
-    protected OrthographicCamera cam;
+    protected OrthographicCamera gameCam;
+    protected OrthographicCamera battleCam;
     protected Viewport viewport;
     protected Stage stage;
 
@@ -18,8 +20,9 @@ public class AbstractScreen implements Screen {
         this.gdxGame = gdxGame;
 
         CameraManager cameraManager = new CameraManager();
-        cam = cameraManager.createCamera();
-        viewport = new StretchViewport(cam.viewportWidth, cam.viewportHeight, cam);
+        gameCam = cameraManager.createCamera(Gdx.graphics.getWidth() / 3, Gdx.graphics.getHeight() / 3, .4f);
+        battleCam = cameraManager.createCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 1);
+        viewport = new StretchViewport(gameCam.viewportWidth, gameCam.viewportHeight, gameCam);
         stage = new Stage(viewport, gdxGame.getBatch());
     }
 
@@ -53,9 +56,10 @@ public class AbstractScreen implements Screen {
     public void dispose() {
         stage.dispose();
     }
-
-    public OrthographicCamera getCam() {
-        return cam;
+    public OrthographicCamera getGameCam() {
+        return gameCam;
     }
-
+    public OrthographicCamera getBattleCam() {
+        return battleCam;
+    }
 }

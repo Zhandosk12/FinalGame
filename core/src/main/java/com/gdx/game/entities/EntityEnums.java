@@ -1,20 +1,17 @@
-package com.gdx.game;
+package com.gdx.game.entities;
 
-public class Enums {
-    public enum TILETYPE {
-        GRASS,
-        WATER,
-        CLIFF
-    }
+public class EntityEnums {
 
     public enum ENTITYTYPE {
         HERO,
         TREE,
-        BIRD
+        BIRD,
+        ENEMY
     }
 
     public enum ENTITYSTATE {
         NONE,
+        IDLE,
         FEEDING,
         WALKING,
         WALKING_UP,
