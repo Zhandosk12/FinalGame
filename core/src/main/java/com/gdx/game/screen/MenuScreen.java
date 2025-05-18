@@ -1,42 +1,46 @@
 package com.gdx.game.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.gdx.game.GdxGame;
-import com.gdx.game.Media;
+import com.gdx.game.audio.AudioObserver;
 import com.gdx.game.manager.AnimationManager;
+import com.gdx.game.manager.ResourceManager;
+import com.gdx.game.screen.transition.effects.FadeInTransitionEffect;
+import com.gdx.game.screen.transition.effects.FadeOutTransitionEffect;
+import com.gdx.game.screen.transition.effects.TransitionEffect;
 
-public class MenuScreen extends AbstractScreen {
+import java.util.ArrayList;
 
-    private final AssetManager assetManager = new AssetManager();
+import static com.gdx.game.audio.AudioObserver.AudioTypeEvent.MENU_THEME;
+
+public class MenuScreen extends BaseScreen {
+
     private Table table;
     private final Stage menuStage = new Stage();
     private Animation<TextureRegion> flowAnimation;
     private float stateTime;
 
-    public MenuScreen(GdxGame gdxGame) {
-        super(gdxGame);
+    public MenuScreen(GdxGame gdxGame, ResourceManager resourceManager) {
+        super(gdxGame, resourceManager);
+        super.musicTheme = MENU_THEME;
 
-        loadAssets();
+        createTable();
         handleBackground();
         handlePlayButton();
+        handleOptionButton();
     }
 
-    private void loadAssets() {
-        assetManager.load("asset/textures.atlas", TextureAtlas.class);
-        assetManager.finishLoading();
+    private void createTable() {
+        table = new Table();
+        table.setBounds(0,0, (float) Gdx.graphics.getWidth(), (float) Gdx.graphics.getHeight());
     }
 
     private void handleBackground() {
@@ -44,11 +48,11 @@ public class MenuScreen extends AbstractScreen {
         int nbCol = 7;
         AnimationManager animationManager = new AnimationManager();
 
-        Texture backgroundSheet = Media.backgroundSheet;
+        Texture backgroundSheet = resourceManager.backgroundSheet;
 
         TextureRegion[][] tmp = animationManager.setTextureRegionsDouble(backgroundSheet,
-                backgroundSheet.getWidth() / nbCol,
-                backgroundSheet.getHeight() / nbRow);
+            backgroundSheet.getWidth() / nbCol,
+            backgroundSheet.getHeight() / nbRow);
 
         TextureRegion[] flowFrames = new TextureRegion[nbCol * nbRow];
         int index = 0;
@@ -61,36 +65,41 @@ public class MenuScreen extends AbstractScreen {
         flowAnimation = animationManager.setAnimation(flowFrames);
     }
 
+    private void handleOptionButton() {
+        createButton("Options", 0, table.getHeight()/10, table);
+
+        Actor optionButton = table.getCells().get(1).getActor();
+        optionButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent even, float x, float y) {
+                setScreenWithTransition((BaseScreen) gdxGame.getScreen(), new OptionScreen(gdxGame, (BaseScreen) gdxGame.getScreen(), resourceManager), new ArrayList<>());
+            }
+        });
+    }
+
     private void handlePlayButton() {
-        table = new Table();
+        createButton("Play", 0, table.getHeight()/9, table);
 
-        TextureAtlas atlas = assetManager.get("asset/textures.atlas", TextureAtlas.class);
-        TextureRegion[][] playButtons = atlas.findRegion("play_button").split(80, 40);
-
-        BitmapFont pixel10 = new BitmapFont(Gdx.files.internal("fonts/pixel.fnt"), atlas.findRegion("pixel"), false);
-
-        TextureRegionDrawable imageUp = new TextureRegionDrawable(playButtons[0][0]);
-        TextureRegionDrawable imageDown = new TextureRegionDrawable(playButtons[1][0]);
-
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle(imageUp, imageDown, null, pixel10);
-        TextButton playButton = new TextButton("Play", buttonStyle);
-        playButton.getLabel().setColor(new Color(79 / 255.f, 79 / 255.f, 117 / 255.f, 1));
+        Actor playButton = table.getCells().get(0).getActor();
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent even, float x, float y) {
-                gdxGame.setScreen(gdxGame.getGameScreen());
+                ArrayList<TransitionEffect> effects = new ArrayList<>();
+                effects.add(new FadeOutTransitionEffect(1f));
+                effects.add(new FadeInTransitionEffect(1f));
+                setScreenWithTransition((BaseScreen) gdxGame.getScreen(), gdxGame.getGameScreen(), effects);
             }
         });
-
-        table.add(playButton);
-        table.setPosition((float) Gdx.graphics.getWidth()/2, (float) Gdx.graphics.getHeight()/2);
-
-        menuStage.addActor(table);
     }
 
     @Override
     public void show() {
+        menuStage.addActor(table);
         Gdx.input.setInputProcessor(menuStage);
+        Gdx.graphics.setCursor(Gdx.graphics.newCursor(resourceManager.cursor, 0, 0));
+
+        notify(AudioObserver.AudioCommand.MUSIC_LOAD, MENU_THEME);
+        notify(AudioObserver.AudioCommand.MUSIC_PLAY_LOOP, MENU_THEME);
     }
 
     @Override
@@ -102,12 +111,15 @@ public class MenuScreen extends AbstractScreen {
         gdxGame.getBatch().draw(currentFrame, 0,0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         gdxGame.getBatch().end();
 
-        menuStage.act(delta);
-        menuStage.draw();
+        if (!resourceManager.isOptionScreen()) {
+            menuStage.act(delta);
+            menuStage.draw();
+        }
     }
 
     @Override
     public void dispose() {
+        super.dispose();
         table.remove();
     }
 }

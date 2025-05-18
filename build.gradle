@@ -1,13 +1,4 @@
 buildscript {
-  repositories {
-    mavenCentral()
-    maven { url 'https://s01.oss.sonatype.org' }
-    gradlePluginPortal()
-    mavenLocal()
-    google()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
-  }
   dependencies {
 
 
@@ -59,15 +50,6 @@ configure(subprojects) {
 subprojects {
   version = "$projectVersion"
   ext.appName = 'ВЫПЗDSGP'
-  repositories {
-    mavenCentral()
-    maven { url 'https://s01.oss.sonatype.org' }
-    // You may want to remove the following line if you have errors downloading dependencies.
-    mavenLocal()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://jitpack.io' }
-  }
 }
 
 eclipse.project.name = 'ВЫПЗDSGP' + '-parent'
