@@ -4,12 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-
 import com.gdx.game.screen.transition.ImmediateModeRendererUtils;
 
 public class FadeInTransitionEffect extends TransitionEffect {
 
-    private final Color color = new Color();
+    private Color color = new Color();
 
     public FadeInTransitionEffect(float duration) {
         super(duration);
@@ -17,7 +16,7 @@ public class FadeInTransitionEffect extends TransitionEffect {
 
     @Override
     public void render(Screen current, Screen next) {
-        next.show();
+        //next.show();
         next.render(Gdx.graphics.getDeltaTime());
         color.set(0f, 0f, 0f, 1f - getAlpha());
 

@@ -15,6 +15,7 @@ import com.gdx.game.audio.AudioObserver;
 import com.gdx.game.component.Component;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.entities.EntityFactory;
+import com.gdx.game.entities.player.PlayerHUD;
 import com.gdx.game.entities.player.PlayerInputComponent;
 import com.gdx.game.manager.ResourceManager;
 import com.gdx.game.map.Map;
@@ -45,38 +46,49 @@ public class GameScreen extends BaseScreen {
         PAUSED,
         GAME_OVER
     }
-
     private static GameState gameState;
 
     protected OrthogonalTiledMapRenderer mapRenderer = null;
     protected MapManager mapManager;
     protected OrthographicCamera camera;
-    private final Stage gameStage = new Stage();
+    protected OrthographicCamera hudCamera;
+    private Stage gameStage = new Stage();
 
-    private final Json json;
-    private final InputMultiplexer multiplexer;
+    private Json json;
+    private GdxGame game;
+    private InputMultiplexer multiplexer;
 
-    private final Entity player;
+    private Entity player;
+    private PlayerHUD playerHUD;
 
     private AudioObserver.AudioTypeEvent musicTheme;
 
     public GameScreen(GdxGame game, ResourceManager resourceManager) {
         super(game, resourceManager);
+        this.game = game;
         mapManager = new MapManager();
         json = new Json();
 
         setGameState(GameState.RUNNING);
-        setupViewport();
 
+        //_camera setup
+        setupViewport(15, 15);
+
+        //get the current size
         camera = new OrthographicCamera();
         camera.setToOrtho(false, VIEWPORT.viewportWidth, VIEWPORT.viewportHeight);
 
-        player = EntityFactory.getEntity(EntityFactory.EntityType.PLAYER);
+        player = EntityFactory.getInstance().getEntity(EntityFactory.EntityType.PLAYER);
         mapManager.setPlayer(player);
         mapManager.setCamera(camera);
 
+        hudCamera = new OrthographicCamera();
+        hudCamera.setToOrtho(false, VIEWPORT.physicalWidth, VIEWPORT.physicalHeight);
+
+        playerHUD = new PlayerHUD(hudCamera, player, mapManager);
+
         multiplexer = new InputMultiplexer();
-        assert player != null;
+        multiplexer.addProcessor(playerHUD.getStage());
         multiplexer.addProcessor(player.getInputProcessor());
         Gdx.input.setInputProcessor(multiplexer);
     }
@@ -89,18 +101,16 @@ public class GameScreen extends BaseScreen {
     @Override
     public void show() {
         ProfileManager.getInstance().addObserver(mapManager);
+        ProfileManager.getInstance().addObserver(playerHUD);
 
+        setGameState(GameState.LOADING);
         setGameState(GameState.RUNNING);
         Gdx.input.setInputProcessor(multiplexer);
-
-        if (mapRenderer == null) {
-            mapRenderer = new OrthogonalTiledMapRenderer(mapManager.getCurrentTiledMap(), Map.UNIT_SCALE);
-        }
     }
 
     @Override
     public void hide() {
-        if (gameState != GameState.GAME_OVER) {
+        if(gameState != GameState.GAME_OVER) {
             setGameState(GameState.SAVING);
         }
 
@@ -110,8 +120,13 @@ public class GameScreen extends BaseScreen {
     @Override
     public void render(float delta) {
 
-        if (gameState == GameState.PAUSED) {
+        if(mapRenderer == null) {
+            mapRenderer = new OrthogonalTiledMapRenderer(mapManager.getCurrentTiledMap(), Map.UNIT_SCALE);
+        }
+
+        if(gameState == GameState.PAUSED) {
             player.updateInput(delta);
+            playerHUD.render(delta);
             return;
         }
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -122,12 +137,14 @@ public class GameScreen extends BaseScreen {
         mapRenderer.getBatch().enableBlending();
         mapRenderer.getBatch().setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        if (mapManager.hasMapChanged()) {
+        if(mapManager.hasMapChanged()) {
             mapRenderer.setMap(mapManager.getCurrentTiledMap());
             player.sendMessage(Component.MESSAGE.INIT_START_POSITION, json.toJson(mapManager.getPlayerStartUnitScaled()));
 
             camera.position.set(mapManager.getPlayerStartUnitScaled().x, mapManager.getPlayerStartUnitScaled().y, 0f);
             camera.update();
+
+            playerHUD.updateEntityObservers();
 
             mapManager.setMapChanged(false);
         }
@@ -135,8 +152,9 @@ public class GameScreen extends BaseScreen {
         mapRenderer.render();
         mapManager.updateCurrentMapEntities(mapManager, mapRenderer.getBatch(), delta);
         player.update(mapManager, mapRenderer.getBatch(), delta);
+        playerHUD.render(delta);
 
-        if (((PlayerInputComponent) player.getInputProcessor()).isOption()) {
+        if(((PlayerInputComponent) player.getInputProcessor()).isOption()) {
             Image screenShot = new Image(ScreenUtils.getFrameBufferTexture());
             gdxGame.setScreen(new OptionScreen(gdxGame, (BaseScreen) gdxGame.getScreen(), screenShot, resourceManager));
             ((PlayerInputComponent) player.getInputProcessor()).setOption(false);
@@ -148,29 +166,32 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public void resize(int width, int height) {
-        setupViewport();
+        setupViewport(15, 15);
         camera.setToOrtho(false, VIEWPORT.viewportWidth, VIEWPORT.viewportHeight);
+        playerHUD.resize((int) VIEWPORT.physicalWidth, (int) VIEWPORT.physicalHeight);
     }
 
     @Override
     public void pause() {
         setGameState(GameState.SAVING);
+        playerHUD.pause();
     }
 
     @Override
     public void resume() {
         setGameState(GameState.LOADING);
+        playerHUD.resume();
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        if (player != null) {
+        if(player != null) {
             player.unregisterObservers();
             player.dispose();
         }
 
-        if (mapRenderer != null) {
+        if(mapRenderer != null) {
             mapRenderer.dispose();
         }
 
@@ -179,7 +200,7 @@ public class GameScreen extends BaseScreen {
     }
 
     public static void setGameState(GameState gameState) {
-        switch (gameState) {
+        switch(gameState) {
             case RUNNING:
                 GameScreen.gameState = GameState.RUNNING;
                 break;
@@ -192,9 +213,9 @@ public class GameScreen extends BaseScreen {
                 GameScreen.gameState = GameState.PAUSED;
                 break;
             case PAUSED:
-                if (GameScreen.gameState == GameState.PAUSED) {
+                if( GameScreen.gameState == GameState.PAUSED ){
                     GameScreen.gameState = GameState.RUNNING;
-                } else if (GameScreen.gameState == GameState.RUNNING) {
+                }else if( GameScreen.gameState == GameState.RUNNING ){
                     GameScreen.gameState = GameState.PAUSED;
                 }
                 break;
@@ -208,24 +229,35 @@ public class GameScreen extends BaseScreen {
 
     }
 
-    private static void setupViewport() {
-        VIEWPORT.virtualWidth = 15;
-        VIEWPORT.virtualHeight = 15;
+    private static void setupViewport(int width, int height) {
+        //Make the viewport a percentage of the total display area
+        VIEWPORT.virtualWidth = width;
+        VIEWPORT.virtualHeight = height;
+
+        //Current viewport dimensions
         VIEWPORT.viewportWidth = VIEWPORT.virtualWidth;
         VIEWPORT.viewportHeight = VIEWPORT.virtualHeight;
+
+        //pixel dimensions of display
         VIEWPORT.physicalWidth = Gdx.graphics.getWidth();
         VIEWPORT.physicalHeight = Gdx.graphics.getHeight();
+
+        //aspect ratio for current viewport
         VIEWPORT.aspectRatio = (VIEWPORT.virtualWidth / VIEWPORT.virtualHeight);
-        if (VIEWPORT.physicalWidth / VIEWPORT.physicalHeight >= VIEWPORT.aspectRatio) {
-            VIEWPORT.viewportWidth = VIEWPORT.viewportHeight * (VIEWPORT.physicalWidth / VIEWPORT.physicalHeight);
+
+        //update viewport if there could be skewing
+        if(VIEWPORT.physicalWidth / VIEWPORT.physicalHeight >= VIEWPORT.aspectRatio) {
+            //Letterbox left and right
+            VIEWPORT.viewportWidth = VIEWPORT.viewportHeight * (VIEWPORT.physicalWidth/VIEWPORT.physicalHeight);
             VIEWPORT.viewportHeight = VIEWPORT.virtualHeight;
         } else {
+            //letterbox above and below
             VIEWPORT.viewportWidth = VIEWPORT.virtualWidth;
-            VIEWPORT.viewportHeight = VIEWPORT.viewportWidth * (VIEWPORT.physicalHeight / VIEWPORT.physicalWidth);
+            VIEWPORT.viewportHeight = VIEWPORT.viewportWidth * (VIEWPORT.physicalHeight/VIEWPORT.physicalWidth);
         }
 
-        LOGGER.debug("WorldRenderer: virtual: (" + VIEWPORT.virtualWidth + "," + VIEWPORT.virtualHeight + ")");
-        LOGGER.debug("WorldRenderer: viewport: (" + VIEWPORT.viewportWidth + "," + VIEWPORT.viewportHeight + ")");
-        LOGGER.debug("WorldRenderer: physical: (" + VIEWPORT.physicalWidth + "," + VIEWPORT.physicalHeight + ")");
+        LOGGER.debug("WorldRenderer: virtual: (" + VIEWPORT.virtualWidth + "," + VIEWPORT.virtualHeight + ")" );
+        LOGGER.debug("WorldRenderer: viewport: (" + VIEWPORT.viewportWidth + "," + VIEWPORT.viewportHeight + ")" );
+        LOGGER.debug("WorldRenderer: physical: (" + VIEWPORT.physicalWidth + "," + VIEWPORT.physicalHeight + ")" );
     }
 }

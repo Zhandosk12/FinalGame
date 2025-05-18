@@ -12,10 +12,10 @@ import java.util.Hashtable;
 
 public class ProfileManager extends ProfileSubject {
 
-    private final Json json;
+    private Json json;
     private static ProfileManager profileManager;
-    private final Hashtable<String,FileHandle> profiles;
-    private ObjectMap profileProperties = new ObjectMap<>();
+    private Hashtable<String,FileHandle> profiles;
+    private ObjectMap<String, Object> profileProperties = new ObjectMap<>();
     private String profileName;
     private boolean isNewProfile = false;
 
@@ -26,17 +26,25 @@ public class ProfileManager extends ProfileSubject {
     public ProfileManager() {
         json = new Json();
         profiles = new Hashtable<>();
+        profiles.clear();
         profileName = DEFAULT_PROFILE;
         storeAllProfiles();
     }
 
-    public static ProfileManager getInstance() {
+    public static final ProfileManager getInstance() {
         if(profileManager == null) {
             profileManager = new ProfileManager();
         }
         return profileManager;
     }
 
+    public void setIsNewProfile(boolean isNewProfile) {
+        this.isNewProfile = isNewProfile;
+    }
+
+    public boolean getIsNewProfile() {
+        return this.isNewProfile;
+    }
 
     public Array<String> getProfileList() {
         Array<String> profiles = new Array<>();
@@ -68,7 +76,7 @@ public class ProfileManager extends ProfileSubject {
     }
 
     public void writeProfileToStorage(String profileName, String fileData, boolean overwrite) {
-        String fullFilename = profileName+SAVEGAME_SUFFIX;
+        String fullFilename = profileName + SAVEGAME_SUFFIX;
 
         boolean localFileExists = Gdx.files.local(fullFilename).exists();
 
@@ -91,7 +99,7 @@ public class ProfileManager extends ProfileSubject {
         profileProperties.put(key, object);
     }
 
-    public <T> T getProperty(String key, Class<T> type){
+    public <T extends Object> T getProperty(String key, Class<T> type){
         T property = null;
         if(!profileProperties.containsKey(key)) {
             return property;
@@ -112,7 +120,7 @@ public class ProfileManager extends ProfileSubject {
             saveProfile();
         }
 
-        String fullProfileFileName = profileName +SAVEGAME_SUFFIX;
+        String fullProfileFileName = profileName + SAVEGAME_SUFFIX;
         boolean doesProfileFileExist = Gdx.files.local(fullProfileFileName).exists();
 
         if(!doesProfileFileExist) {

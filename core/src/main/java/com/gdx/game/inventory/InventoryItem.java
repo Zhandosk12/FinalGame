@@ -11,7 +11,7 @@ public class InventoryItem extends Image {
         EQUIPPABLE(2),
         STACKABLE(4);
 
-        private final int attribute;
+        private int attribute;
 
         ItemAttribute(int attribute) {
             this.attribute = attribute;
@@ -37,7 +37,7 @@ public class InventoryItem extends Image {
         ARMOR_FEET(1024),
         QUEST_ITEM(2048);
 
-        private final int itemUseType;
+        private int itemUseType;
 
         ItemUseType(int itemUseType) {
             this.itemUseType = itemUseType;
@@ -161,6 +161,7 @@ public class InventoryItem extends Image {
     }
 
     public int getTradeValue() {
+        //For now, we will set the trade in value of items at about one third their original value
         if (itemValue >= 0) {
             return MathUtils.floor(itemValue * .33f) + 2;
         } else {

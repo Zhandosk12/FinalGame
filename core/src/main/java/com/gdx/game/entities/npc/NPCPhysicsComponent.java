@@ -1,7 +1,6 @@
 package com.gdx.game.entities.npc;
 
 import com.badlogic.gdx.math.Vector2;
-
 import com.gdx.game.component.PhysicsComponent;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.map.MapManager;

@@ -1,14 +1,13 @@
 package com.gdx.game.map.worldMap;
 
 import com.badlogic.gdx.math.Vector2;
-
-import com.gdx.game.map.MapFactory;
 import com.gdx.game.audio.AudioObserver;
 import com.gdx.game.component.Component;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.entities.EntityConfig;
 import com.gdx.game.entities.EntityFactory;
 import com.gdx.game.map.Map;
+import com.gdx.game.map.MapFactory;
 import com.gdx.game.profile.ProfileManager;
 
 import static com.gdx.game.audio.AudioObserver.AudioTypeEvent.TEST_THEME;

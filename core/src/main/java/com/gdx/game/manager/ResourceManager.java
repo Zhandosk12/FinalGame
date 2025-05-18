@@ -22,10 +22,14 @@ public class ResourceManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceManager.class);
 
     protected boolean isOptionScreen;
-    private static final InternalFileHandleResolver filePathResolver = new InternalFileHandleResolver();
-
+    private static final InternalFileHandleResolver filePathResolver =  new InternalFileHandleResolver();
+    private final static String ITEMS_TEXTURE_ATLAS_PATH = "skins/items.atlas";
     public TextureAtlas atlas;
-
+    public static TextureAtlas ITEMS_TEXTURE_ATLAS = new TextureAtlas(ITEMS_TEXTURE_ATLAS_PATH);
+    private final static String STATUSUI_TEXTURE_ATLAS_PATH = "skins/statusui.atlas";
+    private final static String STATUS_UI_SKIN_PATH = "skins/statusui.json";
+    public static TextureAtlas STATUS_UI_TEXTURE_ATLAS = new TextureAtlas(STATUSUI_TEXTURE_ATLAS_PATH);
+    public static Skin STATUS_UI_SKIN = new Skin(Gdx.files.internal(STATUS_UI_SKIN_PATH), STATUS_UI_TEXTURE_ATLAS);
     public Texture backgroundSheet;
     public Texture battleBackgroundMeadow;
     public Pixmap cursor;
@@ -67,21 +71,21 @@ public class ResourceManager {
     }
 
     public static void loadMapAsset(String mapFilenamePath) {
-        if (mapFilenamePath == null || mapFilenamePath.isEmpty()) {
+        if(mapFilenamePath == null || mapFilenamePath.isEmpty()) {
             return;
         }
 
-        if (assetManager.isLoaded(mapFilenamePath)) {
+        if(assetManager.isLoaded(mapFilenamePath)) {
             return;
         }
 
-        if (filePathResolver.resolve(mapFilenamePath).exists()) {
+        if(filePathResolver.resolve(mapFilenamePath).exists() ) {
             assetManager.setLoader(TiledMap.class, new TmxMapLoader(filePathResolver));
             assetManager.load(mapFilenamePath, TiledMap.class);
             assetManager.finishLoadingAsset(mapFilenamePath);
             LOGGER.debug("Map loaded!: {}", mapFilenamePath);
         } else {
-            LOGGER.debug("Map doesn't exist!: {}", mapFilenamePath);
+            LOGGER.debug("Map doesn't exist!: {}", mapFilenamePath );
         }
     }
 
@@ -91,7 +95,7 @@ public class ResourceManager {
 
     public static TiledMap getMapAsset(String mapFilenamePath) {
         TiledMap map = null;
-        if (assetManager.isLoaded(mapFilenamePath)) {
+        if(assetManager.isLoaded(mapFilenamePath)) {
             map = assetManager.get(mapFilenamePath, TiledMap.class);
         } else {
             LOGGER.debug("Map is not loaded: {}", mapFilenamePath);
@@ -101,14 +105,14 @@ public class ResourceManager {
     }
 
     public static void loadTextureAsset(String textureFilenamePath) {
-        if (textureFilenamePath == null || textureFilenamePath.isEmpty()) {
+        if(textureFilenamePath == null || textureFilenamePath.isEmpty()) {
             return;
         }
 
-        if (assetManager.isLoaded(textureFilenamePath)) {
+        if(assetManager.isLoaded(textureFilenamePath)) {
             return;
         }
-        if (filePathResolver.resolve(textureFilenamePath).exists()) {
+        if(filePathResolver.resolve(textureFilenamePath).exists()) {
             assetManager.setLoader(Texture.class, new TextureLoader(filePathResolver));
             assetManager.load(textureFilenamePath, Texture.class);
             assetManager.finishLoadingAsset(textureFilenamePath);
@@ -120,8 +124,8 @@ public class ResourceManager {
     public static Texture getTextureAsset(String textureFilenamePath) {
         Texture texture = null;
 
-        if (assetManager.isLoaded(textureFilenamePath)) {
-            texture = assetManager.get(textureFilenamePath, Texture.class);
+        if(assetManager.isLoaded(textureFilenamePath)) {
+            texture = assetManager.get(textureFilenamePath,Texture.class);
         } else {
             LOGGER.debug("Texture is not loaded: {}", textureFilenamePath);
         }
@@ -130,15 +134,15 @@ public class ResourceManager {
     }
 
     public static void loadMusicAsset(String musicFilenamePath) {
-        if (musicFilenamePath == null || musicFilenamePath.isEmpty()) {
+        if(musicFilenamePath == null || musicFilenamePath.isEmpty()) {
             return;
         }
 
-        if (assetManager.isLoaded(musicFilenamePath)) {
+        if(assetManager.isLoaded(musicFilenamePath)) {
             return;
         }
 
-        if (filePathResolver.resolve(musicFilenamePath).exists()) {
+        if(filePathResolver.resolve(musicFilenamePath).exists()) {
             assetManager.setLoader(Music.class, new MusicLoader(filePathResolver));
             assetManager.load(musicFilenamePath, Music.class);
             assetManager.finishLoadingAsset(musicFilenamePath);
@@ -150,7 +154,7 @@ public class ResourceManager {
 
     public static Music getMusicAsset(String musicFilenamePath) {
         Music music = null;
-        if (assetManager.isLoaded(musicFilenamePath)) {
+        if(assetManager.isLoaded(musicFilenamePath)) {
             music = assetManager.get(musicFilenamePath, Music.class);
         } else {
             LOGGER.debug("Music is not loaded: {}", musicFilenamePath);

@@ -1,7 +1,6 @@
 package com.gdx.game.screen;
 
 import com.badlogic.gdx.Game;
-
 import com.gdx.game.GdxGame;
 import com.gdx.game.audio.AudioObserver;
 import com.gdx.game.screen.transition.effects.TransitionEffect;

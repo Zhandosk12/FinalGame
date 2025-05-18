@@ -11,13 +11,12 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import com.gdx.game.component.ComponentObserver;
 import com.gdx.game.component.GraphicsComponent;
-import com.gdx.game.map.Map;
-import com.gdx.game.map.MapManager;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.entities.EntityConfig;
+import com.gdx.game.map.Map;
+import com.gdx.game.map.MapManager;
 
 public class NPCGraphicsComponent extends GraphicsComponent {
 

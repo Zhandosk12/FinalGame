@@ -6,13 +6,11 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import com.gdx.game.component.Component;
 import com.gdx.game.component.ComponentObserver;
+import com.gdx.game.entities.Entity;
 import com.gdx.game.profile.ProfileManager;
 import com.gdx.game.profile.ProfileObserver;
-import com.gdx.game.entities.Entity;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +42,12 @@ public class MapManager implements ProfileObserver {
                 loadMap(mapType);
 
                 Vector2 toppleRoad1MapStartPosition = profileManager.getProperty("toppleRoad1MapStartPosition", Vector2.class);
-                if( toppleRoad1MapStartPosition != null ){
+                if(toppleRoad1MapStartPosition != null) {
                     MapFactory.getMap(MapFactory.MapType.TOPPLE_ROAD_1).setPlayerStart(toppleRoad1MapStartPosition);
                 }
 
                 Vector2 toppleMapStartPosition = profileManager.getProperty("toppleMapStartPosition", Vector2.class);
-                if( toppleMapStartPosition != null ){
+                if(toppleMapStartPosition != null) {
                     MapFactory.getMap(MapFactory.MapType.TOPPLE).setPlayerStart(toppleMapStartPosition);
                 }
 
@@ -59,15 +57,17 @@ public class MapManager implements ProfileObserver {
                     profileManager.setProperty("currentMapType", this.currentMap.currentMapType.toString());
                 }
 
-                profileManager.setProperty("toppleMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOPPLE).getPlayerStart() );
+                profileManager.setProperty("toppleMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOPPLE).getPlayerStart());
+                profileManager.setProperty("toppleRoad1MapStartPosition", MapFactory.getMap(MapFactory.MapType.TOPPLE_ROAD_1).getPlayerStart() );
                 break;
             case CLEAR_CURRENT_PROFILE:
                 this.currentMap = null;
-                profileManager.setProperty("currentMapType", MapFactory.MapType.TOPPLE_ROAD_1.toString());
+                profileManager.setProperty("currentMapType", MapFactory.MapType.TOPPLE.toString());
 
                 MapFactory.clearCache();
 
-                profileManager.setProperty("toppleMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOPPLE).getPlayerStart() );
+                profileManager.setProperty("toppleMapStartPosition", MapFactory.getMap(MapFactory.MapType.TOPPLE).getPlayerStart());
+                profileManager.setProperty("toppleRoad1MapStartPosition", MapFactory.getMap(MapFactory.MapType.TOPPLE_ROAD_1).getPlayerStart() );
                 break;
             default:
                 break;
@@ -82,7 +82,7 @@ public class MapManager implements ProfileObserver {
             return;
         }
 
-        if(currentMap != null) {
+        if(currentMap != null && currentMap.getMusicTheme() != map.getMusicTheme()) {
             currentMap.unloadMusic();
         }
 

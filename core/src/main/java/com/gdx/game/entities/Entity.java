@@ -11,11 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.gdx.game.component.Component;
-import com.gdx.game.component.ComponentObserver;
-import com.gdx.game.component.GraphicsComponent;
-import com.gdx.game.component.InputComponent;
-import com.gdx.game.component.PhysicsComponent;
+import com.gdx.game.component.*;
 import com.gdx.game.map.MapManager;
 import com.gdx.game.profile.ProfileManager;
 

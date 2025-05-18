@@ -2,7 +2,6 @@ package com.gdx.game.entities;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-
 import com.gdx.game.component.Component;
 import com.gdx.game.entities.npc.NPCGraphicsComponent;
 import com.gdx.game.entities.npc.NPCInputComponent;

@@ -3,7 +3,6 @@ package com.gdx.game.entities.player;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
-
 import com.gdx.game.component.InputComponent;
 import com.gdx.game.entities.Entity;
 

@@ -1,7 +1,6 @@
 package com.gdx.game.audio;
 
 import com.badlogic.gdx.audio.Music;
-
 import com.gdx.game.manager.PreferenceManager;
 import com.gdx.game.manager.ResourceManager;
 import org.slf4j.Logger;

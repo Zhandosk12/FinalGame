@@ -13,6 +13,7 @@ import com.gdx.game.GdxGame;
 import com.gdx.game.audio.AudioObserver;
 import com.gdx.game.manager.AnimationManager;
 import com.gdx.game.manager.ResourceManager;
+import com.gdx.game.profile.ProfileManager;
 import com.gdx.game.screen.transition.effects.FadeInTransitionEffect;
 import com.gdx.game.screen.transition.effects.FadeOutTransitionEffect;
 import com.gdx.game.screen.transition.effects.TransitionEffect;
@@ -24,7 +25,7 @@ import static com.gdx.game.audio.AudioObserver.AudioTypeEvent.MENU_THEME;
 public class MenuScreen extends BaseScreen {
 
     private Table table;
-    private final Stage menuStage = new Stage();
+    private Stage menuStage = new Stage();
     private Animation<TextureRegion> flowAnimation;
     private float stateTime;
 
@@ -84,9 +85,10 @@ public class MenuScreen extends BaseScreen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent even, float x, float y) {
+                ProfileManager.getInstance().setIsNewProfile(true);
+
                 ArrayList<TransitionEffect> effects = new ArrayList<>();
                 effects.add(new FadeOutTransitionEffect(1f));
-                effects.add(new FadeInTransitionEffect(1f));
                 setScreenWithTransition((BaseScreen) gdxGame.getScreen(), gdxGame.getGameScreen(), effects);
             }
         });
