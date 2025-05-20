@@ -18,6 +18,7 @@ import com.gdx.game.animation.AnimatedImage;
 import com.gdx.game.audio.AudioObserver;
 import com.gdx.game.battle.BattleObserver;
 import com.gdx.game.battle.BattleState;
+import com.gdx.game.battle.BattleStatusUI;
 import com.gdx.game.battle.BattleUI;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.entities.EntityConfig;
@@ -48,13 +49,19 @@ public class BattleScreen extends BaseScreen implements BattleObserver {
     private final AnimatedImage opponentImage;
     private final Entity enemy;
     private final BattleUI battleUI;
+    private final BattleStatusUI battleStatusUI;
     private final PlayerHUD playerHUD;
+
+    //private AnimatedImage image;
+
     private final int enemyWidth = 50;
     private final int enemyHeight = 50;
     private final int playerWidth = 50;
     private final int playerHeight = 50;
 
     private final BattleState battleState;
+    private final TextButton attackButton = null;
+    private final TextButton runButton = null;
     private final Label dmgPlayerValLabel;
     private final Label dmgOpponentValLabel;
 
@@ -100,6 +107,14 @@ public class BattleScreen extends BaseScreen implements BattleObserver {
         dmgOpponentValLabel = new Label("0", ResourceManager.skin);
         dmgOpponentValLabel.setVisible(false);
         origDmgOpponentValLabelY = dmgOpponentValLabel.getY() + enemyHeight;
+
+        battleStatusUI = new BattleStatusUI();
+        playerHUD.setBattleStatusUI(battleStatusUI);
+        battleStatusUI.setKeepWithinStage(false);
+        battleStatusUI.setVisible(true);
+        battleStatusUI.setPosition(0, 0);
+        battleStatusUI.setWidth(battleStage.getWidth() / 2);
+        battleStatusUI.setHeight(battleStage.getHeight() / 4);
 
         battleUI = new BattleUI(battleState);
         battleUI.setMovable(false);
@@ -231,6 +246,7 @@ public class BattleScreen extends BaseScreen implements BattleObserver {
         battleStage.addActor(battleUI);
         battleStage.addActor(dmgPlayerLabelTable);
         battleStage.addActor(dmgOpponentLabelTable);
+        battleStage.addActor(battleStatusUI);
         Gdx.input.setInputProcessor(battleStage);
 
         notify(AudioObserver.AudioCommand.MUSIC_LOAD, BATTLE_THEME);
@@ -260,6 +276,8 @@ public class BattleScreen extends BaseScreen implements BattleObserver {
         if (playerImage.getActions().size == 0 && !playerImage.getCurrentAnimationType().equals(Entity.AnimationType.LOOK_RIGHT)) {
             playerImage.setCurrentAnimation(Entity.AnimationType.LOOK_RIGHT);
         }
+
+        //playerHUD.render(delta);
 
         //box2d.tick(getBattleCam(), controlManager);
     }
