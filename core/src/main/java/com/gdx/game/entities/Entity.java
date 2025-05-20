@@ -11,7 +11,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.gdx.game.component.*;
+import com.gdx.game.component.Component;
+import com.gdx.game.component.ComponentObserver;
+import com.gdx.game.component.GraphicsComponent;
+import com.gdx.game.component.InputComponent;
+import com.gdx.game.component.PhysicsComponent;
 import com.gdx.game.map.MapManager;
 import com.gdx.game.profile.ProfileManager;
 
@@ -60,7 +64,8 @@ public class Entity {
         WALK_UP,
         WALK_DOWN,
         IDLE,
-        IMMOBILE
+        IMMOBILE,
+        LOOK_RIGHT
     }
 
     public static final int FRAME_WIDTH = 16;
@@ -97,19 +102,19 @@ public class Entity {
         return this;
     }
 
-    public Entity(InputComponent inputComponent, PhysicsComponent physicsComponent, GraphicsComponent graphicsComponent) {
+    public Entity(InputComponent inputCpnt, PhysicsComponent physicsCpnt, GraphicsComponent graphicsCpnt) {
         entityConfig = new EntityConfig();
         json = new Json();
 
         components = new Array<>(MAX_COMPONENTS);
 
-        this.inputComponent = inputComponent;
-        this.physicsComponent = physicsComponent;
-        this.graphicsComponent = graphicsComponent;
+        inputComponent = inputCpnt;
+        physicsComponent = physicsCpnt;
+        graphicsComponent = graphicsCpnt;
 
-        components.add(this.inputComponent);
-        components.add(this.physicsComponent);
-        components.add(this.graphicsComponent);
+        components.add(inputComponent);
+        components.add(physicsComponent);
+        components.add(graphicsComponent);
     }
 
     public EntityConfig getEntityConfig() {
@@ -158,6 +163,14 @@ public class Entity {
 
     public Rectangle getCurrentBoundingBox() {
         return physicsComponent.boundingBox;
+    }
+
+    public EntityFactory.EntityName getEntityEncounteredType() {
+        return physicsComponent.entityEncounteredType;
+    }
+
+    public void setEntityEncounteredType(EntityFactory.EntityName entityName) {
+        this.physicsComponent.entityEncounteredType = entityName;
     }
 
     public Vector2 getCurrentPosition() {

@@ -53,4 +53,14 @@ public class ToppleRoad1 extends Map {
             entity.setEntityConfig(entityConfig);
         }
     }
+
+    @Override
+    public void removeObserver(AudioObserver audioObserver) {
+
+    }
+
+    @Override
+    public void removeAllObservers() {
+
+    }
 }

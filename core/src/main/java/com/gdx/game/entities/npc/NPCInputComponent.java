@@ -22,6 +22,8 @@ public class NPCInputComponent extends InputComponent {
         if(string.length == 0) {
             return;
         }
+
+        //Specifically for messages with 1 object payload
         if(string.length == 1) {
             if(string[0].equalsIgnoreCase(MESSAGE.COLLISION_WITH_MAP.toString())) {
                 currentDirection = Entity.Direction.getRandomNext();
@@ -49,12 +51,16 @@ public class NPCInputComponent extends InputComponent {
         if(keys.get(Keys.QUIT)) {
             Gdx.app.exit();
         }
+
+        //If IMMOBILE, don't update anything
         if(currentState == Entity.State.IMMOBILE) {
             entity.sendMessage(MESSAGE.CURRENT_STATE, json.toJson(Entity.State.IMMOBILE));
             return;
         }
 
         frameTime += delta;
+
+        //Change direction after so many seconds
         if(frameTime > MathUtils.random(1,5)) {
             currentState = Entity.State.getRandomNext();
             currentDirection = Entity.Direction.getRandomNext();

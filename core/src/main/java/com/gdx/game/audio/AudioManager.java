@@ -16,7 +16,7 @@ public class AudioManager implements AudioObserver {
 
     private Music currentMusic;
 
-    private final Hashtable<String, Music> queuedMusic;
+    private Hashtable<String, Music> queuedMusic;
 
     private AudioManager() {
         queuedMusic = new Hashtable<>();

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.gdx.game.component.ComponentObserver;
 import com.gdx.game.component.GraphicsComponent;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.entities.EntityConfig;
@@ -27,6 +26,12 @@ public class PlayerGraphicsComponent extends GraphicsComponent {
 
         if(string.length == 0) {
             return;
+        }
+
+        if(string.length == 1) {
+            if(string[0].equalsIgnoreCase(MESSAGE.RESET_POSITION.toString())) {
+                currentPosition = null;
+            }
         }
         if(string.length == 2) {
             if(string[0].equalsIgnoreCase(MESSAGE.CURRENT_POSITION.toString())) {
@@ -64,7 +69,6 @@ public class PlayerGraphicsComponent extends GraphicsComponent {
     public void update(Entity entity, MapManager mapMgr, Batch batch, float delta) {
         updateAnimations(delta);
         if(previousPosition.x != currentPosition.x || previousPosition.y != currentPosition.y) {
-            notify("", ComponentObserver.ComponentEvent.PLAYER_HAS_MOVED);
             previousPosition = currentPosition.cpy();
         }
 
@@ -75,7 +79,6 @@ public class PlayerGraphicsComponent extends GraphicsComponent {
         batch.begin();
         batch.draw(currentFrame, currentPosition.x, currentPosition.y, 1, 1);
         batch.end();
-
     }
 
     @Override

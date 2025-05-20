@@ -23,6 +23,8 @@ public abstract class InputComponent extends ComponentSubject implements Compone
 
     protected static Map<Keys, Boolean> keys = new HashMap<>();
     protected static Map<Mouse, Boolean> mouseButtons = new HashMap<>();
+
+    //initialize the hashmap for inputs
     static {
         keys.put(Keys.LEFT, false);
         keys.put(Keys.RIGHT, false);

@@ -1,6 +1,8 @@
 package com.gdx.game.entities.npc;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.gdx.game.component.Component;
 import com.gdx.game.component.PhysicsComponent;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.map.MapManager;
@@ -20,7 +22,7 @@ public class NPCPhysicsComponent extends PhysicsComponent {
 
     @Override
     public void receiveMessage(String message) {
-        String[] string = message.split(MESSAGE_TOKEN);
+        String[] string = message.split(Component.MESSAGE_TOKEN);
 
         if(string.length == 0) {
             return;
@@ -49,7 +51,7 @@ public class NPCPhysicsComponent extends PhysicsComponent {
             return;
         }
 
-        if(!isCollisionWithMapLayer(entity, mapMgr) && isCollisionWithMapEntities(entity, mapMgr) && state == Entity.State.WALKING) {
+        if(!isCollisionWithMapLayer(entity, mapMgr) && !isCollisionWithMapEntities(entity, mapMgr) && state == Entity.State.WALKING) {
             setNextPositionToCurrent(entity);
         } else {
             updateBoundingBoxPosition(currentEntityPosition);
@@ -58,8 +60,9 @@ public class NPCPhysicsComponent extends PhysicsComponent {
     }
 
     private boolean isEntityFarFromPlayer(MapManager mapMgr) {
-        selectionRay.set(mapMgr.getPlayer().getCurrentBoundingBox().x, mapMgr.getPlayer().getCurrentBoundingBox().y, 0.0f, boundingBox.x, boundingBox.y, 0.0f);
-        float distance =  selectionRay.origin.dst(selectionRay.direction);
+        Vector3 vec3Player = new Vector3(mapMgr.getPlayer().getCurrentBoundingBox().x, mapMgr.getPlayer().getCurrentBoundingBox().y, 0.0f);
+        Vector3 vec3Npc = new Vector3(boundingBox.x, boundingBox.y, 0.0f);
+        float distance = vec3Player.dst(vec3Npc);
 
         return !(distance <= SELECT_RAY_MAXIMUM_DISTANCE);
     }
@@ -67,7 +70,7 @@ public class NPCPhysicsComponent extends PhysicsComponent {
     @Override
     protected boolean isCollisionWithMapEntities(Entity entity, MapManager mapMgr) {
         if(isCollision(entity, mapMgr.getPlayer())) {
-            return false;
+            return true;
         }
 
         return super.isCollisionWithMapEntities(entity, mapMgr);

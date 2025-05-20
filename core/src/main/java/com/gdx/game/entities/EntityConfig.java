@@ -6,8 +6,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.gdx.game.inventory.InventoryItem;
 
 public class EntityConfig {
-    private final Array<AnimationConfig> animationConfig;
-    private final Array<InventoryItem.ItemTypeID> inventory;
+    private Array<AnimationConfig> animationConfig;
+    private Array<InventoryItem.ItemTypeID> inventory;
     private Entity.State state = Entity.State.IDLE;
     private Entity.Direction direction = Entity.Direction.DOWN;
     private String entityID;
@@ -15,7 +15,17 @@ public class EntityConfig {
     private String questConfigPath;
     private String currentQuestID;
     private String itemTypeID;
-    private final ObjectMap<String, String> entityProperties;
+    private ObjectMap<String, String> entityProperties;
+
+    public enum EntityProperties {
+        ENTITY_HEALTH_POINTS,
+        ENTITY_ATTACK_POINTS,
+        ENTITY_DEFENSE_POINTS,
+        ENTITY_HIT_DAMAGE_TOTAL,
+        ENTITY_XP_REWARD,
+        ENTITY_GP_REWARD,
+        NONE
+    }
 
     EntityConfig() {
         animationConfig = new Array<>();
@@ -40,6 +50,26 @@ public class EntityConfig {
 
         entityProperties = new ObjectMap<>();
         entityProperties.putAll(config.entityProperties);
+    }
+
+    public ObjectMap<String, String> getEntityProperties() {
+        return entityProperties;
+    }
+
+    public void setEntityProperties(ObjectMap<String, String> entityProperties) {
+        this.entityProperties = entityProperties;
+    }
+
+    public void setPropertyValue(String key, String value) {
+        entityProperties.put(key, value);
+    }
+
+    public String getPropertyValue(String key) {
+        Object propertyVal = entityProperties.get(key);
+        if (propertyVal == null) {
+            return "";
+        }
+        return propertyVal.toString();
     }
 
     public String getCurrentQuestID() {
@@ -102,8 +132,16 @@ public class EntityConfig {
         return animationConfig;
     }
 
+    public void addAnimationConfig(AnimationConfig animationConfig) {
+        this.animationConfig.add(animationConfig);
+    }
+
     public Array<InventoryItem.ItemTypeID> getInventory() {
         return inventory;
+    }
+
+    public void setInventory(Array<InventoryItem.ItemTypeID> inventory) {
+        this.inventory = inventory;
     }
 
     public static class AnimationConfig {

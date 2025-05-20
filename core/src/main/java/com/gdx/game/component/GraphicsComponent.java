@@ -41,7 +41,9 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
     public abstract void update(Entity entity, MapManager mapManager, Batch batch, float delta);
 
     protected void updateAnimations(float delta) {
-        frameTime = (frameTime + delta)%5;
+        frameTime = (frameTime + delta)%5; //Want to avoid overflow
+
+        //Look into the appropriate variable when changing position
         switch(currentDirection) {
             case DOWN:
                 if(currentState == Entity.State.WALKING) {
@@ -51,13 +53,13 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
                     }
                     currentFrame = animation.getKeyFrame(frameTime);
                 } else if(currentState == Entity.State.IDLE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_DOWN);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_DOWN);
                     if(animation == null) {
                         return;
                     }
                     currentFrame = animation.getKeyFrames()[0];
                 } else if(currentState == Entity.State.IMMOBILE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
                     if( animation == null ) {
                         return;
                     }
@@ -66,19 +68,19 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
                 break;
             case LEFT:
                 if(currentState == Entity.State.WALKING) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_LEFT);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_LEFT);
                     if(animation == null) {
                         return;
                     }
                     currentFrame = animation.getKeyFrame(frameTime);
                 } else if(currentState == Entity.State.IDLE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_LEFT);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_LEFT);
                     if(animation == null) {
                         return;
                     }
                     currentFrame = animation.getKeyFrames()[0];
                 } else if(currentState == Entity.State.IMMOBILE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
                     if(animation == null) {
                         return;
                     }
@@ -87,19 +89,19 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
                 break;
             case UP:
                 if(currentState == Entity.State.WALKING) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_UP);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_UP);
                     if(animation == null) {
                         return;
                     }
                     currentFrame = animation.getKeyFrame(frameTime);
                 } else if(currentState == Entity.State.IDLE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_UP);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_UP);
                     if(animation == null) {
                         return;
                     }
                     currentFrame = animation.getKeyFrames()[0];
                 } else if(currentState == Entity.State.IMMOBILE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
                     if(animation == null) {
                         return;
                     }
@@ -108,19 +110,19 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
                 break;
             case RIGHT:
                 if(currentState == Entity.State.WALKING) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_RIGHT);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_RIGHT);
                     if(animation == null) {
                         return;
                     }
                     currentFrame = animation.getKeyFrame(frameTime);
                 } else if(currentState == Entity.State.IDLE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_RIGHT);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.WALK_RIGHT);
                     if( animation == null ) {
                         return;
                     }
                     currentFrame = animation.getKeyFrames()[0];
                 } else if(currentState == Entity.State.IMMOBILE) {
-					Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
+                    Animation<TextureRegion> animation = animations.get(Entity.AnimationType.IMMOBILE);
                     if(animation == null) {
                         return;
                     }
@@ -132,6 +134,7 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
         }
     }
 
+    //Specific to two frame animations where each frame is stored in a separate texture
     protected Animation<TextureRegion> loadAnimation(String firstTexture, String secondTexture, Array<GridPoint2> points, float frameDuration) {
         ResourceManager.loadTextureAsset(firstTexture);
         Texture texture1 = ResourceManager.getTextureAsset(firstTexture);
@@ -144,8 +147,8 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
 
         GridPoint2 point = points.first();
 
-		Animation<TextureRegion> animation = new Animation<>(frameDuration, texture1Frames[point.x][point.y],texture2Frames[point.x][point.y]);
-		animation.setPlayMode(Animation.PlayMode.LOOP);
+        Animation<TextureRegion> animation = new Animation<>(frameDuration, texture1Frames[point.x][point.y],texture2Frames[point.x][point.y]);
+        animation.setPlayMode(Animation.PlayMode.LOOP);
 
         return animation;
     }
@@ -159,11 +162,11 @@ public abstract class GraphicsComponent extends ComponentSubject implements Comp
         TextureRegion[] animationKeyFrames = new TextureRegion[points.size];
 
         for(int i=0; i < points.size; i++) {
-			animationKeyFrames[i] = textureFrames[points.get(i).x][points.get(i).y];
+            animationKeyFrames[i] = textureFrames[points.get(i).x][points.get(i).y];
         }
 
         Animation<TextureRegion> animation = new Animation<>(frameDuration, animationKeyFrames);
-		animation.setPlayMode(Animation.PlayMode.LOOP);
+        animation.setPlayMode(Animation.PlayMode.LOOP);
 
         return animation;
     }

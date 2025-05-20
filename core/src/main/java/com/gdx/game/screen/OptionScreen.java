@@ -13,7 +13,6 @@ import com.crashinvaders.vfx.effects.GaussianBlurEffect;
 import com.gdx.game.GdxGame;
 import com.gdx.game.audio.AudioManager;
 import com.gdx.game.audio.AudioObserver;
-import com.gdx.game.manager.PreferenceManager;
 import com.gdx.game.manager.ResourceManager;
 
 import java.util.ArrayList;
@@ -23,11 +22,11 @@ public class OptionScreen extends BaseScreen {
     private Table optionTable;
     private Table musicTable;
     private Table controlTable;
-    private final Stage optionStage = new Stage();
-    private final Stage musicStage = new Stage();
-    private final Stage controlStage = new Stage();
-    private final Stage backgroundStage = new Stage();
-    private final BaseScreen previousScreen;
+    private Stage optionStage = new Stage();
+    private Stage musicStage = new Stage();
+    private Stage controlStage = new Stage();
+    private Stage backgroundStage = new Stage();
+    private BaseScreen previousScreen;
     private Image previousScreenAsImg;
     private boolean musicClickListener;
     private boolean controlClickListener;
@@ -56,18 +55,14 @@ public class OptionScreen extends BaseScreen {
     private void loadContents() {
         vfxManager = new VfxManager(Pixmap.Format.RGBA8888);
         vfxEffect = new GaussianBlurEffect();
-        vfxManager.addEffect(vfxEffect);
+        if(previousScreen.getClass() != MenuScreen.class) {
+            vfxManager.addEffect(vfxEffect);
+        }
 
         optionTable = createTable();
         handleControlButton();
         handleMusicButton();
         handleBackButton();
-    }
-
-    private Table createTable() {
-        Table table = new Table();
-        table.setBounds(0,0, (float) Gdx.graphics.getWidth(), (float) Gdx.graphics.getHeight());
-        return table;
     }
 
     private void handleControlButton() {
@@ -115,10 +110,10 @@ public class OptionScreen extends BaseScreen {
         Label musicLabel = new Label("MUSIC", resourceManager.skin);
         musicLabel.setAlignment(Align.left);
         Slider musicSlider = new Slider(0, 1, 0.01f, false, resourceManager.skin);
-        musicSlider.setValue(PreferenceManager.getMusicVolume());
+        musicSlider.setValue(gdxGame.getPreferenceManager().getMusicVolume());
         musicSlider.addListener(event -> {
             gdxGame.getPreferenceManager().setMusicVolume(musicSlider.getValue());
-            AudioManager.getInstance().getCurrentMusic().setVolume(PreferenceManager.getMusicVolume());
+            AudioManager.getInstance().getCurrentMusic().setVolume(gdxGame.getPreferenceManager().getMusicVolume());
             return false;
         });
         CheckBox musicCheckbox = new CheckBox("Enable Music", resourceManager.skin);

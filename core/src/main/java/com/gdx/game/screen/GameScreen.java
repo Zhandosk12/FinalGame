@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.gdx.game.GdxGame;
 import com.gdx.game.audio.AudioManager;
 import com.gdx.game.audio.AudioObserver;
+import com.gdx.game.camera.CameraStyles;
 import com.gdx.game.component.Component;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.entities.EntityFactory;
@@ -24,6 +25,8 @@ import com.gdx.game.map.MapManager;
 import com.gdx.game.profile.ProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public class GameScreen extends BaseScreen {
 
@@ -61,11 +64,18 @@ public class GameScreen extends BaseScreen {
     private Entity player;
     private PlayerHUD playerHUD;
 
+    private float startX;
+    private float startY;
+    private float levelWidth;
+    private float levelHeight;
+    private float endX;
+    private float endY;
+
     private AudioObserver.AudioTypeEvent musicTheme;
 
-    public GameScreen(GdxGame game, ResourceManager resourceManager) {
-        super(game, resourceManager);
-        this.game = game;
+    public GameScreen(GdxGame gdxGame, ResourceManager resourceManager) {
+        super(gdxGame, resourceManager);
+        game = gdxGame;
         mapManager = new MapManager();
         json = new Json();
 
@@ -78,7 +88,7 @@ public class GameScreen extends BaseScreen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, VIEWPORT.viewportWidth, VIEWPORT.viewportHeight);
 
-        player = EntityFactory.getInstance().getEntity(EntityFactory.EntityType.PLAYER);
+        player = EntityFactory.getEntity(ProfileManager.getInstance().getProperty("playerCharacter", EntityFactory.EntityType.class));
         mapManager.setPlayer(player);
         mapManager.setCamera(camera);
 
@@ -104,8 +114,11 @@ public class GameScreen extends BaseScreen {
         ProfileManager.getInstance().addObserver(playerHUD);
 
         setGameState(GameState.LOADING);
-        setGameState(GameState.RUNNING);
         Gdx.input.setInputProcessor(multiplexer);
+
+        if(mapRenderer == null) {
+            mapRenderer = new OrthogonalTiledMapRenderer(mapManager.getCurrentTiledMap(), Map.UNIT_SCALE);
+        }
     }
 
     @Override
@@ -119,11 +132,6 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public void render(float delta) {
-
-        if(mapRenderer == null) {
-            mapRenderer = new OrthogonalTiledMapRenderer(mapManager.getCurrentTiledMap(), Map.UNIT_SCALE);
-        }
-
         if(gameState == GameState.PAUSED) {
             player.updateInput(delta);
             playerHUD.render(delta);
@@ -152,11 +160,25 @@ public class GameScreen extends BaseScreen {
         mapRenderer.render();
         mapManager.updateCurrentMapEntities(mapManager, mapRenderer.getBatch(), delta);
         player.update(mapManager, mapRenderer.getBatch(), delta);
+
+        startX = camera.viewportWidth / 2;
+        startY = camera.viewportHeight / 2;
+        levelWidth = mapManager.getCurrentTiledMap().getProperties().get("width", Integer.class);
+        levelHeight = mapManager.getCurrentTiledMap().getProperties().get("height", Integer.class);
+        endX = levelWidth * ResourceManager.SQUARE_TILE_SIZE * Map.UNIT_SCALE - startX * 2;
+        endY = levelHeight * ResourceManager.SQUARE_TILE_SIZE * Map.UNIT_SCALE - startY * 2;
+        CameraStyles.boundaries(camera, startX, startY, endX, endY);
+
         playerHUD.render(delta);
+
+        if(player.getEntityEncounteredType() == EntityFactory.EntityName.RABITE) {
+            setScreenWithTransition((BaseScreen) gdxGame.getScreen(), new BattleScreen(game, playerHUD, mapManager, resourceManager), new ArrayList<>());
+            PlayerInputComponent.clear();
+        }
 
         if(((PlayerInputComponent) player.getInputProcessor()).isOption()) {
             Image screenShot = new Image(ScreenUtils.getFrameBufferTexture());
-            gdxGame.setScreen(new OptionScreen(gdxGame, (BaseScreen) gdxGame.getScreen(), screenShot, resourceManager));
+            game.setScreen(new OptionScreen(game, (BaseScreen) game.getScreen(), screenShot, resourceManager));
             ((PlayerInputComponent) player.getInputProcessor()).setOption(false);
         }
 
@@ -199,31 +221,35 @@ public class GameScreen extends BaseScreen {
         MapFactory.clearCache();
     }
 
-    public static void setGameState(GameState gameState) {
-        switch(gameState) {
+    public static GameState getGameState() {
+        return gameState;
+    }
+
+    public static void setGameState(GameState state) {
+        switch(state) {
             case RUNNING:
-                GameScreen.gameState = GameState.RUNNING;
+                gameState = GameState.RUNNING;
                 break;
             case LOADING:
                 ProfileManager.getInstance().loadProfile();
-                GameScreen.gameState = GameState.RUNNING;
+                gameState = GameState.RUNNING;
                 break;
             case SAVING:
                 ProfileManager.getInstance().saveProfile();
-                GameScreen.gameState = GameState.PAUSED;
+                gameState = GameState.PAUSED;
                 break;
             case PAUSED:
-                if( GameScreen.gameState == GameState.PAUSED ){
-                    GameScreen.gameState = GameState.RUNNING;
-                }else if( GameScreen.gameState == GameState.RUNNING ){
-                    GameScreen.gameState = GameState.PAUSED;
+                if(gameState == GameState.PAUSED) {
+                    gameState = GameState.RUNNING;
+                } else if(gameState == GameState.RUNNING) {
+                    gameState = GameState.PAUSED;
                 }
                 break;
             case GAME_OVER:
-                GameScreen.gameState = GameState.GAME_OVER;
+                gameState = GameState.GAME_OVER;
                 break;
             default:
-                GameScreen.gameState = GameState.RUNNING;
+                gameState = GameState.RUNNING;
                 break;
         }
 

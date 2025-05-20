@@ -26,6 +26,7 @@ public abstract class Map implements AudioSubject {
 
     public static final float UNIT_SCALE  = 1/16f;
 
+    //Map layers
     protected static final String COLLISION_LAYER = "MAP_COLLISION_LAYER";
     protected static final String SPAWNS_LAYER = "MAP_SPAWNS_LAYER";
     protected static final String PORTAL_LAYER = "MAP_PORTAL_LAYER";
@@ -38,6 +39,7 @@ public abstract class Map implements AudioSubject {
     public static final String GROUND_LAYER = "Ground_Layer";
     public static final String DECORATION_LAYER = "Decoration_Layer";
 
+    //Starting locations
     protected static final String PLAYER_START = "PLAYER_START";
     protected static final String NPC_START = "NPC_START";
     protected static final String ENEMY_SPAWN = "ENEMY_SPAWN";
@@ -127,6 +129,7 @@ public abstract class Map implements AudioSubject {
         npcStartPositions = getNPCStartPositions();
         specialNPCStartPositions = getSpecialNPCStartPositions();
 
+        //Observers
         this.addObserver(AudioManager.getInstance());
     }
 
@@ -142,11 +145,14 @@ public abstract class Map implements AudioSubject {
             String taskID = (String)object.getProperties().get("taskID");
 
             if(name == null || taskID == null || name.isEmpty() || taskID.isEmpty() ||
-                    !name.equalsIgnoreCase(objectName) || !taskID.equalsIgnoreCase(objectTaskID)) {
+                !name.equalsIgnoreCase(objectName) || !taskID.equalsIgnoreCase(objectTaskID)) {
                 continue;
             }
+            //Get center of rectangle
             float x = ((RectangleMapObject)object).getRectangle().getX();
             float y = ((RectangleMapObject)object).getRectangle().getY();
+
+            //scale by the unit to convert from map coordinates
             x *= UNIT_SCALE;
             y *= UNIT_SCALE;
 
@@ -238,9 +244,11 @@ public abstract class Map implements AudioSubject {
             }
 
             if(objectName.equalsIgnoreCase(NPC_START)) {
+                //Get center of rectangle
                 float x = ((RectangleMapObject)object).getRectangle().getX();
                 float y = ((RectangleMapObject)object).getRectangle().getY();
 
+                //scale by the unit to convert from map coordinates
                 x *= UNIT_SCALE;
                 y *= UNIT_SCALE;
 
@@ -259,9 +267,13 @@ public abstract class Map implements AudioSubject {
             if(objectName == null || objectName.isEmpty()) {
                 continue;
             }
+
+            //This is meant for all the special spawn locations, a catch all, so ignore known ones
+            //Get center of rectangle
             float x = ((RectangleMapObject)object).getRectangle().getX();
             float y = ((RectangleMapObject)object).getRectangle().getY();
 
+            //scale by the unit to convert from map coordinates
             x *= UNIT_SCALE;
             y *= UNIT_SCALE;
 
@@ -279,13 +291,17 @@ public abstract class Map implements AudioSubject {
             if(objectName == null || objectName.isEmpty()) {
                 continue;
             }
+
+            //This is meant for all the special spawn locations, a catch all, so ignore known ones
             if(objectName.equalsIgnoreCase(NPC_START) || objectName.equalsIgnoreCase(PLAYER_START)) {
                 continue;
             }
 
+            //Get center of rectangle
             float x = ((RectangleMapObject)object).getRectangle().getX();
             float y = ((RectangleMapObject)object).getRectangle().getY();
 
+            //scale by the unit to convert from map coordinates
             x *= UNIT_SCALE;
             y *= UNIT_SCALE;
 
@@ -295,10 +311,14 @@ public abstract class Map implements AudioSubject {
     }
 
     private void setClosestStartPosition(final Vector2 position) {
-         LOGGER.debug("setClosestStartPosition INPUT: (" + position.x + "," + position.y + ") " + currentMapType.toString());
+        LOGGER.debug("setClosestStartPosition INPUT: (" + position.x + "," + position.y + ") " + currentMapType.toString());
+
+        //Get last known position on this map
         playerStartPositionRect.set(0,0);
         closestPlayerStartPosition.set(0,0);
         float shortestDistance = 0f;
+
+        //Go through all player start positions and choose closest to last known position
         for(MapObject object: spawnsLayer.getObjects()) {
             String objectName = object.getName();
 
@@ -333,6 +353,16 @@ public abstract class Map implements AudioSubject {
     @Override
     public void addObserver(AudioObserver audioObserver) {
         observers.add(audioObserver);
+    }
+
+    @Override
+    public void removeObserver(AudioObserver audioObserver) {
+        observers.removeValue(audioObserver, true);
+    }
+
+    @Override
+    public void removeAllObservers() {
+        observers.removeAll(observers, true);
     }
 
     @Override

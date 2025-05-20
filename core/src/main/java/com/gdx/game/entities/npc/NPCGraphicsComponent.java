@@ -24,7 +24,7 @@ public class NPCGraphicsComponent extends GraphicsComponent {
     private boolean wasSelected = false;
 
     private boolean sentShowConversationMessage = false;
-    private boolean sentHideCoversationMessage = false;
+    private boolean sentHideConversationMessage = false;
 
     public NPCGraphicsComponent() {
         // Nothing
@@ -89,12 +89,12 @@ public class NPCGraphicsComponent extends GraphicsComponent {
             if(!sentShowConversationMessage) {
                 notify(json.toJson(entity.getEntityConfig()), ComponentObserver.ComponentEvent.SHOW_CONVERSATION);
                 sentShowConversationMessage = true;
-                sentHideCoversationMessage = false;
+                sentHideConversationMessage = false;
             }
         } else {
-            if(!sentHideCoversationMessage) {
+            if(!sentHideConversationMessage) {
                 notify(json.toJson(entity.getEntityConfig()), ComponentObserver.ComponentEvent.HIDE_CONVERSATION);
-                sentHideCoversationMessage = true;
+                sentHideConversationMessage = true;
                 sentShowConversationMessage = false;
             }
         }
@@ -102,6 +102,17 @@ public class NPCGraphicsComponent extends GraphicsComponent {
         batch.begin();
         batch.draw(currentFrame, currentPosition.x, currentPosition.y, 1, 1);
         batch.end();
+
+        //Used to graphically debug boundingboxes
+        /*
+        Rectangle rect = entity.getCurrentBoundingBox();
+        Camera camera = mapMgr.getCamera();
+        _shapeRenderer.setProjectionMatrix(camera.combined);
+        _shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        _shapeRenderer.setColor(Color.BLACK);
+        _shapeRenderer.rect(rect.getX() * Map.UNIT_SCALE, rect.getY() * Map.UNIT_SCALE, rect.getWidth() * Map.UNIT_SCALE, rect.getHeight() * Map.UNIT_SCALE);
+        _shapeRenderer.end();
+        */
     }
 
     private void drawSelected(Entity entity, MapManager mapMgr) {

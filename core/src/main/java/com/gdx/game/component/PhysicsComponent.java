@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.gdx.game.entities.Entity;
+import com.gdx.game.entities.EntityFactory;
 import com.gdx.game.map.Map;
 import com.gdx.game.map.MapManager;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
     protected Vector2 nextEntityPosition;
     protected Vector2 currentEntityPosition;
     protected Entity.Direction currentDirection;
+    public EntityFactory.EntityName entityEncounteredType;
     protected Json json;
     protected Vector2 velocity;
 
@@ -58,19 +60,20 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
         boolean isCollisionWithMapEntities = false;
 
         for(Entity mapEntity: tempEntities) {
+            //Check for testing against self
             if(mapEntity.equals(entity)) {
                 continue;
             }
 
             Rectangle targetRect = mapEntity.getCurrentBoundingBox();
             if(boundingBox.overlaps(targetRect)){
-                entity.sendMessage(MESSAGE.COLLISION_WITH_ENTITY);
+                entity.sendMessage(MESSAGE.COLLISION_WITH_ENTITY, mapEntity.getEntityConfig().getEntityID());
                 isCollisionWithMapEntities = true;
                 break;
             }
         }
         tempEntities.clear();
-        return !isCollisionWithMapEntities;
+        return isCollisionWithMapEntities;
     }
 
     protected boolean isCollision(Entity entitySource, Entity entityTarget) {
@@ -81,6 +84,7 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
         }
 
         if(entitySource.getCurrentBoundingBox().overlaps(entityTarget.getCurrentBoundingBox())) {
+            //Collision
             entitySource.sendMessage(MESSAGE.COLLISION_WITH_ENTITY);
             isCollisionWithMapEntities = true;
         }
@@ -99,6 +103,7 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
             if(object instanceof RectangleMapObject) {
                 Rectangle rectangle = ((RectangleMapObject)object).getRectangle();
                 if(boundingBox.overlaps(rectangle)) {
+                    //Collision
                     entity.sendMessage(MESSAGE.COLLISION_WITH_MAP);
                     return true;
                 }
@@ -149,10 +154,12 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
         nextEntityPosition.x = testX;
         nextEntityPosition.y = testY;
 
+        //velocity
         velocity.scl(1 / deltaTime);
     }
 
     protected void initBoundingBox(float percentageWidthReduced, float percentageHeightReduced) {
+        //Update the current bounding box
         float width;
         float height;
 
@@ -177,6 +184,8 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
         if(width == 0 || height == 0) {
             LOGGER.debug("Width and Height are 0!! " + width + ":" + height);
         }
+
+        //Need to account for the unitscale, since the map coordinates will be in pixels
         float minX;
         float minY;
 
@@ -200,6 +209,7 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
     }
 
     protected void updateBoundingBoxPosition(Vector2 position) {
+        //Need to account for the unitscale, since the map coordinates will be in pixels
         float minX;
         float minY;
 
@@ -211,10 +221,10 @@ public abstract class PhysicsComponent extends ComponentSubject implements Compo
                 boundingBox.set(minX, minY, boundingBox.getWidth(), boundingBox.getHeight());
                 break;
             case BOTTOM_CENTER:
-                boundingBox.setCenter(minX + (float) Entity.FRAME_WIDTH /2, minY + (float) Entity.FRAME_HEIGHT /4);
+                boundingBox.setCenter(minX + Entity.FRAME_WIDTH/2, minY + Entity.FRAME_HEIGHT/4);
                 break;
             case CENTER:
-                boundingBox.setCenter(minX + (float) Entity.FRAME_WIDTH /2, minY + (float) Entity.FRAME_HEIGHT /2);
+                boundingBox.setCenter(minX + Entity.FRAME_WIDTH/2, minY + Entity.FRAME_HEIGHT/2);
                 break;
         }
     }
