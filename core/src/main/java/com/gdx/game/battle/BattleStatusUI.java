@@ -17,14 +17,14 @@ import static com.gdx.game.manager.ResourceManager.STATUS_UI_TEXTURE_ATLAS;
 
 public class BattleStatusUI extends Window implements StatusSubject {
 
-    private final ProfileManager profileManager = ProfileManager.getInstance();
+    private ProfileManager profileManager = ProfileManager.getInstance();
 
     private Image hpBar;
     private Image mpBar;
     private Image xpBar;
 
-    private final Array<LevelTable> levelTables;
-    private final Array<StatusObserver> observers;
+    private Array<LevelTable> levelTables;
+    private Array<StatusObserver> observers;
     private static final String LEVEL_TABLE_CONFIG = "scripts/level_tables.json";
 
     //Attributes
@@ -167,7 +167,7 @@ public class BattleStatusUI extends Window implements StatusSubject {
     public void setLevelValue(int levelValue) {
         this.levelVal = levelValue;
         levelValLabel.setText(String.valueOf(levelVal));
-        //notify(levelVal, StatusObserver.StatusEvent.UPDATED_LEVEL);
+        notify(levelVal, StatusObserver.StatusEvent.UPDATED_LEVEL);
     }
 
     public int getXPValue() {
@@ -199,7 +199,7 @@ public class BattleStatusUI extends Window implements StatusSubject {
 
         updateBar(xpBar, xpVal, xpCurrentMax);
 
-        //notify(xpVal, StatusObserver.StatusEvent.UPDATED_XP);
+        notify(xpVal, StatusObserver.StatusEvent.UPDATED_XP);
     }
 
     public void setXPValueMax(int maxXPValue) {
@@ -276,7 +276,7 @@ public class BattleStatusUI extends Window implements StatusSubject {
 
         updateBar(hpBar, hpVal, hpCurrentMax);
 
-        //notify(hpVal, StatusObserver.StatusEvent.UPDATED_HP);
+        notify(hpVal, StatusObserver.StatusEvent.UPDATED_HP);
     }
 
     public void setHPValueMax(int maxHPValue) {
@@ -317,7 +317,7 @@ public class BattleStatusUI extends Window implements StatusSubject {
 
         updateBar(mpBar, mpVal, mpCurrentMax);
 
-        //notify(mpVal, StatusObserver.StatusEvent.UPDATED_MP);
+        notify(mpVal, StatusObserver.StatusEvent.UPDATED_MP);
     }
 
     public void setMPValueMax(int maxMPValue) {

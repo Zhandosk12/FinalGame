@@ -10,12 +10,16 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.gdx.game.GdxGame;
 import com.gdx.game.audio.AudioObserver;
 import com.gdx.game.battle.BattleHUD;
+import com.gdx.game.battle.BattleInventoryUI;
 import com.gdx.game.battle.BattleObserver;
 import com.gdx.game.battle.BattleState;
 import com.gdx.game.entities.Entity;
 import com.gdx.game.entities.player.PlayerHUD;
+import com.gdx.game.inventory.InventoryItemLocation;
+import com.gdx.game.inventory.InventoryUI;
 import com.gdx.game.manager.ResourceManager;
 import com.gdx.game.map.MapManager;
+import com.gdx.game.profile.ProfileManager;
 import com.gdx.game.screen.transition.effects.FadeOutTransitionEffect;
 import com.gdx.game.screen.transition.effects.TransitionEffect;
 
@@ -26,12 +30,14 @@ import static com.gdx.game.audio.AudioObserver.AudioTypeEvent.BATTLE_THEME;
 public class BattleScreen extends BaseScreen implements BattleObserver {
 
     private TextureRegion[]  textureRegions;
-    private final InputMultiplexer multiplexer;
-    private final OrthographicCamera camera;
-    private final Stage battleStage;
-    private final MapManager mapManager;
-    private final PlayerHUD playerHUD;
-    private final BattleHUD battleHUD;
+    private InputMultiplexer multiplexer;
+    private OrthographicCamera camera;
+    private Stage battleStage;
+    private MapManager mapManager;
+    private PlayerHUD playerHUD;
+    private BattleHUD battleHUD;
+
+    private BattleState battleState;
 
     public BattleScreen(GdxGame gdxGame, PlayerHUD playerHUD_, MapManager mapManager_, ResourceManager resourceManager) {
         super(gdxGame, resourceManager);
@@ -39,7 +45,7 @@ public class BattleScreen extends BaseScreen implements BattleObserver {
         this.mapManager = mapManager_;
         this.playerHUD = playerHUD_;
 
-        BattleState battleState = new BattleState();
+        battleState = new BattleState();
         battleState.addObserver(this);
         playerHUD.setBattleState(battleState);
         camera = new OrthographicCamera();
@@ -74,10 +80,23 @@ public class BattleScreen extends BaseScreen implements BattleObserver {
         setScreenWithTransition((BaseScreen) gdxGame.getScreen(), new GameOverScreen(gdxGame, mapManager, resourceManager), effects);
     }
 
+    private void refreshStatus() {
+        playerHUD.getStatusUI().setHPValue(battleHUD.getBattleStatusUI().getHPValue());
+        playerHUD.getStatusUI().setMPValue(battleHUD.getBattleStatusUI().getMPValue());
+    }
+
+    private void refreshInventory() {
+        Array<InventoryItemLocation> inventory = BattleInventoryUI.getInventory(battleHUD.getBattleInventoryUI().getInventorySlotTable());
+        InventoryUI.populateInventory(playerHUD.getInventoryUI().getInventorySlotTable(), inventory, playerHUD.getInventoryUI().getDragAndDrop(), InventoryUI.PLAYER_INVENTORY, false);
+    }
+
     @Override
     public void onNotify(Entity entity, BattleEvent event) {
         switch(event) {
             case RESUME_OVER:
+                refreshStatus();
+                refreshInventory();
+                ProfileManager.getInstance().saveProfile();
                 setScreenWithTransition((BaseScreen) gdxGame.getScreen(), gdxGame.getGameScreen(), new ArrayList<>());
                 removeEntities();
                 break;
